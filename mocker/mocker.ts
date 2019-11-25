@@ -86,13 +86,13 @@ export default class Mocker implements IMocker {
     let repeat: number = 25 - time.length
     switch (true) {
       case (code >= 500):
-        console.log(KITTY + date + ' |' + chalk.bgRed.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
+        console.log(KITTY + " " + date + ' |' + chalk.bgRed.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
         return
       case (code >= 400 && code < 500):
-        console.log(KITTY + date + ' |' + chalk.black.bgYellow.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
+        console.log(KITTY + " " + date + ' |' + chalk.black.bgYellow.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
         return
       default:
-        console.log(KITTY + date + ' |' + chalk.bgGreen.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
+        console.log(KITTY + " " + date + ' |' + chalk.bgGreen.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
     }
   }
 
