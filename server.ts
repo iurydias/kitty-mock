@@ -36,9 +36,8 @@ function readFile (filename: string): IConfig {
 
 function getPortsArray (text: string): Array<string> {
   let regex = /^\d+-\d+$/
-  let regex2 = /\d+/g
   if (regex.test(text)) {
-    return text.match(regex2)
+    return text.split("-")
   }
   return undefined
 }
