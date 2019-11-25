@@ -8,10 +8,10 @@ import IMocker from './interfaces/IMocker'
 
 describe('Server teste 1', () => {
   let server: IMocker
-  beforeEach(async () => {
+  before(async () => {
     server = await runServer('teste.json')
   })
-  afterEach(async () => {
+  after(async () => {
     await server.stopServer()
   })
 
@@ -21,12 +21,11 @@ describe('Server teste 1', () => {
     await createANewMocker('4000', [5000, 6000]).then(async (port) => {
       await checkMockerStatus(port).then(async () => {
         await deleteMocker(port).then(async () => {
-          await setTimeout(async () => {
-            await checkDeletedMocker(port)
-          }, 200)
+          await checkDeletedMocker(port).then(() => {
+            success++
+          })
         })
       })
-      success++
     }).catch(() => {
       failed++
     })
@@ -36,13 +35,14 @@ describe('Server teste 1', () => {
   it('Create two mockers in a range with one port', async () => {
     let success: number = 0
     let failed: number = 0
-    await runServer('teste2.json').then(async function (server) {
-      await createANewMocker('4001', [6000, 6001]).then(async () => {
+    await runServer('teste2.json').then(async function (serverMockerRoot) {
+      await createANewMocker('4001', [6000, 6001]).then(async (mockerPort) => {
         await createANewMockerWithFail().then(async () => {
-          await server.stopServer()
+          success++
+          await serverMockerRoot.stopServer()
+          await deleteMocker(mockerPort)
         })
       })
-      success++
     }).catch(() => {
       failed++
     })
@@ -60,6 +60,7 @@ describe('Server teste 1', () => {
     await makeRequestToServer('put', port)
     await makeRequestToServer('post', port)
     await makeRequestToServer('patch', port)
+    await deleteMocker(port)
   })
 })
 
