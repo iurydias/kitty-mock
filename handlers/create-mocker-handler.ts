@@ -29,7 +29,7 @@ export default class CreateMockerHandler implements IHandler {
       mocker.loadServer()
       mocker.runServer().then(() => {
         mocker.addRoute({
-          path: '/', method: GET, handler: {
+          path: '/=%5E.%5E=/route', method: GET, handler: {
             handle (req: IncomingMessage): Promise<IResponse> {
               return new Promise(resolve => {
                 resolve({ code: 204, jsend: undefined })
@@ -38,17 +38,11 @@ export default class CreateMockerHandler implements IHandler {
           }
         })
         mocker.addRoute({
-          path: '/', method: DELETE, handler: {
+          path: '/=%5E.%5E=/route', method: DELETE, handler: {
             handle (req: IncomingMessage): Promise<IResponse> {
               return new Promise(resolve => {
                 resolve({ code: 204, jsend: undefined })
-                setTimeout(() => {
-                  mocker.stopServer().then(() => {
-                    console.log('consegui fechar')
-                  }).catch((err) => {
-                    console.log(JSON.stringify(err))
-                  })
-                }, 200)
+                mocker.stopServer()
               })
             }
           }

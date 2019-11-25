@@ -1,3 +1,3 @@
 import server from './server'
 
-server("teste.json")
+server('teste.json')

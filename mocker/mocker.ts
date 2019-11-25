@@ -42,9 +42,9 @@ export default class Mocker implements IMocker {
   }
 
   private static respRequest (res: ServerResponse, resp: IResponse) {
-    res.statusCode = resp.code
-    res.setHeader('Connection', 'close')
-    res.setHeader('Content-Type', 'application/json')
+    //res.statusCode = resp.code
+    //res.setHeader('Connection', 'close')
+    res.writeHead(resp.code, { 'Content-Type': 'application/json' })
     res.end(JSON.stringify(resp.jsend))
   }
 

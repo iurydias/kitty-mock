@@ -88,7 +88,7 @@ async function makeRequestToServer (method: Method, port: string) {
   let failed: number = 0
   await axios({
     method: method,
-    url: 'http://localhost:' + port
+    url: 'http://localhost:' + port + '/=%5E.%5E=/route'
   }).then(() => {
     success++
   }).catch((error) => {
@@ -140,7 +140,7 @@ async function createANewMockerWithFail () {
 async function checkMockerStatus (port: string) {
   let success: number = 0
   let failed: number = 0
-  await axios.get('http://localhost:' + port).then((response) => {
+  await axios.get('http://localhost:' + port + '/=%5E.%5E=/route').then((response) => {
     expect(response.status).to.equal(204)
     success++
   }).catch(() => {
@@ -153,7 +153,7 @@ async function checkMockerStatus (port: string) {
 async function checkDeletedMocker (port: string) {
   let success: number = 0
   let failed: number = 0
-  await axios.get('http://localhost:' + port).then((response) => {
+  await axios.get('http://localhost:' + port + '/=%5E.%5E=/route').then((response) => {
     success++
   }).catch((error) => {
     failed++
@@ -165,7 +165,7 @@ async function checkDeletedMocker (port: string) {
 async function deleteMocker (port: string) {
   let success: number = 0
   let failed: number = 0
-  await axios.delete('http://localhost:' + port).then((response) => {
+  await axios.delete('http://localhost:' + port + '/=%5E.%5E=/route').then((response) => {
     expect(response.status).to.equal(204)
     success++
   }).catch(() => {

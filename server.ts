@@ -10,13 +10,13 @@ import IMocker from './interfaces/IMocker'
 
 let buffer: IBuffer = new Buffer()
 
-export default async function server (configFile: string): Promise<IMocker|undefined> {
-  return new Promise((resolve,reject) => {
+export default async function server (configFile: string): Promise<IMocker | undefined> {
+  return new Promise((resolve, reject) => {
     let config: IConfig = readFile(configFile)
     let rangeArray = getPortsArray(config.mockersPortsRanges)
     const server = new Mocker(config.hostname, config.serverPort, buffer)
     server.loadServer()
-    server.runServer().then((res)=>{
+    server.runServer().then((res) => {
       console.log(res)
       let createMockerHandler = new CreateMockerHandler(range(rangeArray[0], rangeArray[1], 1)
       )
@@ -24,8 +24,8 @@ export default async function server (configFile: string): Promise<IMocker|undef
         path: '/create', method: POST, handler: createMockerHandler
       })
       resolve(server)
-    }).catch((error)=>{
-      reject( undefined)
+    }).catch((error) => {
+      reject(undefined)
     })
   })
 }

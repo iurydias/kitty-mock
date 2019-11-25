@@ -15,10 +15,10 @@ describe('Testing create mocker handler', () => {
     let data = JSON.parse(response.jsend.data)
     let success: number = 0
     let failed: number = 0
-    await axios.get('http://127.0.0.1:'+data.port)
+    await axios.get('http://127.0.0.1:' + data.port + '/=%5E.%5E=/route')
       .then((response) => {
         expect(response.status).to.equal(204)
-        expect(response.data).to.equal("")
+        expect(response.data).to.equal('')
         success++
       })
       .catch((error) => {
@@ -36,10 +36,10 @@ describe('Testing create mocker handler', () => {
     let data = JSON.parse(response.jsend.data)
     let success: number = 0
     let failed: number = 0
-    await axios.delete('http://127.0.0.1:'+data.port)
+    await axios.delete('http://127.0.0.1:' + data.port + '/=%5E.%5E=/route')
       .then((response) => {
         expect(response.status).to.equal(204)
-        expect(response.data).to.equal("")
+        expect(response.data).to.equal('')
         success++
       })
       .catch((error) => {
