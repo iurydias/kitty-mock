@@ -1,5 +1,5 @@
 {
   "hostname": "127.0.0.1",
-  "serverPort": 4000,
+  "serverPort": 4001,
   "mockersPortsRanges": "5000-6000"
 }

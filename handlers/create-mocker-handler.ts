@@ -42,7 +42,7 @@ export default class CreateMockerHandler implements IHandler {
             handle (req: IncomingMessage): Promise<IResponse> {
               return new Promise(resolve => {
                 resolve({ code: 204, jsend: undefined })
-                mocker.stopServer()
+                  mocker.stopServer()
               })
             }
           }

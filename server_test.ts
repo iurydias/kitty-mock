@@ -104,12 +104,10 @@ async function createANewMocker (port: string, range: Array<number>): Promise<st
   let success: number = 0
   let failed: number = 0
   await axios.post('http://localhost:' + port + '/create').then((response) => {
-    console.log(JSON.stringify(response.data))
     expect(response.status).to.equal(200)
     body = JSON.stringify(response.data)
     success++
   }).catch((error) => {
-    console.log(JSON.stringify(error.response.data))
     failed++
   })
   expect(failed).to.equal(0)
@@ -126,10 +124,8 @@ async function createANewMockerWithFail () {
   let success: number = 0
   let failed: number = 0
   await axios.post('http://localhost:4001/create').then((response) => {
-    console.log(JSON.stringify(response.data))
     success++
   }).catch((error) => {
-    console.log(JSON.stringify(error.response.data))
     expect(error.response.status).to.equal(500)
     failed++
   })

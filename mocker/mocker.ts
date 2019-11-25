@@ -1,10 +1,14 @@
 import IBuffer from '../interfaces/IBuffer'
-import { createServer, Server, ServerResponse } from 'http'
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import IRoute from '../interfaces/IRoute'
 import getJsend from '../helpers/get-jsend'
 import IResponse from '../interfaces/IResponse'
 import IMocker from '../interfaces/IMocker'
+import { performance } from 'perf_hooks'
 import ErrnoException = NodeJS.ErrnoException
+import { KITTY } from '../consts/kitty'
+
+const chalk = require('chalk')
 
 export default class Mocker implements IMocker {
   private buffer: IBuffer
@@ -20,32 +24,37 @@ export default class Mocker implements IMocker {
 
   public loadServer () {
     this.server = createServer((req, res) => {
+      let initialTime = performance.now()
       let route: IRoute[] = this.buffer.getItems(this.port.toString(), req.url)
       if (route) {
         let existingRouteWithMethod: IRoute = route.find((route) => {
           return route.method == req.method
         })
-        console.log('route encontrado: ', existingRouteWithMethod, req.url, req.method)
         if (existingRouteWithMethod) {
           existingRouteWithMethod.handler.handle(req).then((resp: IResponse) => {
-            Mocker.respRequest(res, resp)
+            this.respRequest(res, resp, req, initialTime)
           }).catch((resp: IResponse) => {
-            Mocker.respRequest(res, resp)
+            this.respRequest(res, resp, req, initialTime)
           })
         } else {
-          Mocker.respRequest(res, { code: 405, jsend: undefined })
+          this.respRequest(res, { code: 405, jsend: undefined }, req, initialTime)
         }
       } else {
-        Mocker.respRequest(res, { code: 404, jsend: getJsend(404, undefined, 'Not found') })
+        this.respRequest(res, {
+          code: 404,
+          jsend: getJsend(404, undefined, 'Not found')
+        }, req, initialTime)
       }
     })
   }
 
-  private static respRequest (res: ServerResponse, resp: IResponse) {
+  private respRequest (res: ServerResponse, resp: IResponse, req: IncomingMessage, initialTime: number) {
     //res.statusCode = resp.code
     //res.setHeader('Connection', 'close')
     res.writeHead(resp.code, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify(resp.jsend))
+    res.end(JSON.stringify(resp.jsend), ()=>{
+      this.printLog(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''), resp.code, req.method, req.url, this.getExecutionTime(performance.now(), initialTime))
+    })
   }
 
   public runServer (): Promise<string> {
@@ -71,6 +80,24 @@ export default class Mocker implements IMocker {
     return new Promise((resolve, reject) => {
       this.server.close((error) => error ? reject(error) : resolve(null))
     })
+  }
+
+  public printLog (date: string, code: number, method: string, path: string, time: string) {
+    let repeat: number = 25 - time.length
+    switch (true) {
+      case (code >= 500):
+        console.log(KITTY + date + ' |' + chalk.bgRed.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
+        return
+      case (code >= 400 && code < 500):
+        console.log(KITTY + date + ' |' + chalk.black.bgYellow.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
+        return
+      default:
+        console.log(KITTY + date + ' |' + chalk.bgGreen.bold('  ' + code + '  ') + '| ' + " ".repeat(repeat) + time + ' ms | ' + method + ' ' + path)
+    }
+  }
+
+  public getExecutionTime (t1: number, t0: number): string {
+    return (t1 - t0).toString()
   }
 
 }

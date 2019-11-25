@@ -24,6 +24,7 @@
   "homepage": "https://gitlab.com/nTopus/kitty-mock#readme",
   "dependencies": {
     "@types/node": "^12.12.7",
+    "chalk": "^3.0.0",
     "lodash": "^4.17.15",
     "typescript": "^3.7.2"
   },
