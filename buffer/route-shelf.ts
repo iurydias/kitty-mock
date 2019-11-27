@@ -1,8 +1,8 @@
 import IMockerRouter from '../interfaces/IMockerRouter'
 import IRoute from '../interfaces/IRoute'
-import IBuffer from '../interfaces/IBuffer'
+import IRouteShelf from '../interfaces/IRouteShelf'
 
-export default class Buffer implements IBuffer {
+export default class RouteShelf implements IRouteShelf {
   private mockerRoutesList: IMockerRouter[] = []
 
   public getItems (mockerPort: string, routePath: string): IRoute[] | undefined {
@@ -17,7 +17,6 @@ export default class Buffer implements IBuffer {
         return routes
       }
     }
-    return undefined
   }
 
   public setItem (mockerPort: string, route: IRoute): boolean {

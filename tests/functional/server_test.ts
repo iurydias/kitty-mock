@@ -2,14 +2,14 @@ import 'mocha'
 import { expect } from 'chai'
 import axios, { Method } from 'axios'
 import { inRange } from 'lodash'
-import server from './server'
-import IJsend from './interfaces/IJsend'
-import IMocker from './interfaces/IMocker'
+import server from '../../server'
+import IJsend from '../../interfaces/IJsend'
+import IMocker from '../../interfaces/IMocker'
 
 describe('Server teste 1', () => {
   let server: IMocker
   before(async () => {
-    server = await runServer('teste.json')
+    server = await runServer('127.0.0.1', '4000', '5000-6000')
   })
   after(async () => {
     await server.stopServer()
@@ -35,12 +35,13 @@ describe('Server teste 1', () => {
   it('Create two mockers in a range with one port', async () => {
     let success: number = 0
     let failed: number = 0
-    await runServer('teste2.json').then(async function (serverMockerRoot) {
+    await runServer('127.0.0.1', '4001', '6000-6001').then(async function (serverMockerRoot) {
       await createANewMocker('4001', [6000, 6001]).then(async (mockerPort) => {
         await createANewMockerWithFail().then(async () => {
-          success++
-          await serverMockerRoot.stopServer()
           await deleteMocker(mockerPort)
+          await serverMockerRoot.stopServer().then(() => {
+            success++
+          })
         })
       })
     }).catch(() => {
@@ -64,8 +65,8 @@ describe('Server teste 1', () => {
   })
 })
 
-async function runServer (configFile: string): Promise<IMocker | undefined> {
-  return server(configFile)
+async function runServer (host: string, port: string, portsRange: string): Promise<IMocker> {
+  return server({ host: host, serverPort: port, mockersPortsRange: portsRange })
 }
 
 async function makeRequestToServerRoot (method: Method) {
@@ -139,6 +140,7 @@ async function checkMockerStatus (port: string) {
   let failed: number = 0
   await axios.get('http://localhost:' + port + '/=%5E.%5E=/route').then((response) => {
     expect(response.status).to.equal(204)
+    expect(response.data).to.equal('')
     success++
   }).catch(() => {
     failed++
@@ -164,6 +166,7 @@ async function deleteMocker (port: string) {
   let failed: number = 0
   await axios.delete('http://localhost:' + port + '/=%5E.%5E=/route').then((response) => {
     expect(response.status).to.equal(204)
+    expect(response.data).to.equal('')
     success++
   }).catch(() => {
     failed++

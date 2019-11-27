@@ -1,1 +1,1 @@
-export const KITTY = "[^._.^]∫"
+export const KITTY = '(^._.^)∫'

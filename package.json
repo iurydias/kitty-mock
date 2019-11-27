@@ -2,9 +2,9 @@
   "name": "kitty-mock",
   "version": "0.0.1",
   "description": "API Mocker",
-  "main": "main.ts",
+  "main": "server.ts",
   "scripts": {
-    "start": "tsc main.ts && node main.js",
+    "start": "node main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,6 +25,7 @@
   "dependencies": {
     "@types/node": "^12.12.7",
     "chalk": "^3.0.0",
+    "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
     "typescript": "^3.7.2"
   },

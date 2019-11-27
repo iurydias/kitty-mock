@@ -1,27 +1,20 @@
 import { expect } from 'chai'
 import 'mocha'
-import Mocker from './mocker'
-import IResponse from '../interfaces/IResponse'
+import Mocker from '../../mocker/mocker'
+import IResponse from '../../interfaces/IResponse'
 import axios from 'axios'
-import Buffer from '../buffer/buffer'
+import RouteShelf from '../../buffer/route-shelf'
 import { IncomingMessage } from 'http'
+import IRoute from '../../interfaces/IRoute'
 
 describe('Mocker', () => {
 
   it('Creating route', async () => {
-    let buffer = new Buffer()
+    let buffer = new RouteShelf()
     const mocker = new Mocker('127.0.0.1', 5008, buffer)
     mocker.loadServer()
     await mocker.runServer()
-    mocker.addRoute({
-      path: '/oi', method: 'GET', handler: {
-        handle (req: IncomingMessage): Promise<IResponse> {
-          return new Promise(resolve => {
-            resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-          })
-        }
-      }
-    })
+    mocker.addRoute(getMockRoute())
     let responseData: string = ''
     let success: number = 0
     let failed: number = 0
@@ -36,21 +29,14 @@ describe('Mocker', () => {
     expect(failed).to.equal(0)
     expect(success).to.equal(1)
     expect(responseData).to.equal('{"status":"success","data":"oi","message":"oioi"}')
+    await mocker.stopServer()
   })
   it('Stopping server', async () => {
-    let buffer = new Buffer()
+    let buffer = new RouteShelf()
     const mocker = new Mocker('127.0.0.1', 5009, buffer)
     mocker.loadServer()
     await mocker.runServer()
-    mocker.addRoute({
-      path: '/oi', method: 'GET', handler: {
-        handle (req: IncomingMessage): Promise<IResponse> {
-          return new Promise(resolve => {
-            resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-          })
-        }
-      }
-    })
+    mocker.addRoute(getMockRoute())
     await mocker.stopServer()
     let success: number = 0
     let failed: number = 0
@@ -66,3 +52,15 @@ describe('Mocker', () => {
   })
 
 })
+
+function getMockRoute (): IRoute {
+  return {
+    path: '/oi', method: 'GET', handler: {
+      handle (req: IncomingMessage): Promise<IResponse> {
+        return new Promise(resolve => {
+          resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
+        })
+      }
+    }
+  }
+}

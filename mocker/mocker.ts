@@ -1,4 +1,4 @@
-import IBuffer from '../interfaces/IBuffer'
+import IRouteShelf from '../interfaces/IRouteShelf'
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import IRoute from '../interfaces/IRoute'
 import getJsend from '../helpers/get-jsend'
@@ -11,18 +11,18 @@ import ErrnoException = NodeJS.ErrnoException
 const chalk = require('chalk')
 
 export default class Mocker implements IMocker {
-  private buffer: IBuffer
+  private buffer: IRouteShelf
   private port: number
   private server: Server
   private hostname: string
 
-  constructor (hostname: string, port: number, buffer: IBuffer) {
+  constructor (hostname: string, port: number, buffer: IRouteShelf) {
     this.buffer = buffer
     this.port = port
     this.hostname = hostname
   }
 
-  public loadServer () {
+  public loadServer (): void {
     this.server = createServer((req, res) => {
       let initialTime = performance.now()
       let route: IRoute[] = this.buffer.getItems(this.port.toString(), req.url)
@@ -48,7 +48,7 @@ export default class Mocker implements IMocker {
     })
   }
 
-  private respRequest (res: ServerResponse, resp: IResponse, req: IncomingMessage, initialTime: number) {
+  private respRequest (res: ServerResponse, resp: IResponse, req: IncomingMessage, initialTime: number): void {
     //res.statusCode = resp.code
     //res.setHeader('Connection', 'close')
     res.writeHead(resp.code, { 'Content-Type': 'application/json' })
@@ -70,20 +70,20 @@ export default class Mocker implements IMocker {
     })
   }
 
-  public addRoute (route: IRoute) {
-    console.log('New route added to mocker on port ' +  this.port + ' | ' + ' '.repeat(7 - route.method.length) + route.method + ' ' + route.path)
+  public addRoute (route: IRoute): void {
+    console.log('New route added to mocker on port ' + this.port + ' | ' + ' '.repeat(7 - route.method.length) + route.method + ' ' + route.path)
     this.buffer.setItem(this.port.toString(), route)
 
   }
 
-  public stopServer (): Promise<Error | null> {
-    console.log('Closing mocker on port ' +  this.port)
+  public stopServer (): Promise<null> {
+    console.log('Closing mocker on port ' + this.port)
     return new Promise((resolve, reject) => {
       this.server.close((error) => error ? reject(error) : resolve(null))
     })
   }
 
-  public printLog (date: string, code: number, method: string, path: string, time: string) {
+  public printLog (date: string, code: number, method: string, path: string, time: string): void {
     let repeatSpaceOnTimeExecution: number = 20 - time.length
     let repeatSpaceOnMethod: number = 7 - method.length
     switch (true) {

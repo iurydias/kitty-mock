@@ -1,11 +1,11 @@
 import IRoute from './IRoute'
 
 export default interface IMocker {
-  loadServer ()
+  loadServer (): void
 
   runServer (): Promise<string>
 
-  addRoute (route: IRoute)
+  addRoute (route: IRoute): void
 
-  stopServer (): Promise<Error | null>
+  stopServer (): Promise<null>
 }

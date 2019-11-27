@@ -1,42 +1,54 @@
-import IBuffer from './interfaces/IBuffer'
-import Buffer from './buffer/buffer'
+import IRouteShelf from './interfaces/IRouteShelf'
+import RouteShelf from './buffer/route-shelf'
 import Mocker from './mocker/mocker'
 import CreateMockerHandler from './handlers/create-mocker-handler'
 import { POST } from './consts/methods-consts'
-import IConfig from './interfaces/IConfig'
-import { readFileSync } from 'fs'
 import { range } from 'lodash'
 import IMocker from './interfaces/IMocker'
+import IConfig from './interfaces/IConfig'
 
-let buffer: IBuffer = new Buffer()
+let buffer: IRouteShelf = new RouteShelf()
 
-export default async function server (configFile: string): Promise<IMocker> {
+export default function server (config: IConfig): Promise<IMocker> {
   return new Promise((resolve, reject) => {
-    let config: IConfig = readFile(configFile)
-    let rangeArray = getPortsArray(config.mockersPortsRanges)
-    const server = new Mocker(config.hostname, config.serverPort, buffer)
+    let host: string = config.host || '0.0.0.0'
+    let port: string = config.serverPort || '4000'
+    let rangeArray: string = config.mockersPortsRange || '5000-6000'
+    let err: string = checkParamsConfig(host, port, rangeArray)
+    if (err) {
+      return reject(err)
+    }
+    let portsRange = getPortsArray(rangeArray)
+    const server = new Mocker(host, Number(port), buffer)
     server.loadServer()
     server.runServer().then((res) => {
-      let createMockerHandler = new CreateMockerHandler(range(rangeArray[0], rangeArray[1], 1)
+      let createMockerHandler = new CreateMockerHandler(range(portsRange[0], portsRange[1], 1)
       )
       server.addRoute({
         path: '/create', method: POST, handler: createMockerHandler
       })
       resolve(server)
     }).catch((error) => {
-      console.log(error)
+      reject(error)
     })
   })
 }
 
-function readFile (filename: string): IConfig {
-  return JSON.parse(readFileSync(process.cwd() + '/' + filename).toString())
+function getPortsArray (text: string): Array<string> {
+  return text.split('-')
 }
 
-function getPortsArray (text: string): Array<string> {
-  let regex = /^\d+-\d+$/
-  if (regex.test(text)) {
-    return text.split("-")
+function checkParamsConfig (host: string, port: string, portsRange: string): string | undefined {
+  let hostRegex = /^(?=.*[^\.]$)((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.?){4}$/
+  if (!hostRegex.test(host)) {
+    return 'host with invalid format'
   }
-  return undefined
+  let portRegex = /^[\d]*$/
+  if (!portRegex.test(port)) {
+    return 'port with invalid format'
+  }
+  let rangeRegex = /^\d+-\d+$/
+  if (!rangeRegex.test(portsRange)) {
+    return 'mocker ports range with invalid format'
+  }
 }

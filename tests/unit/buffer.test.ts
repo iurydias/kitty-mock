@@ -1,23 +1,15 @@
 import { expect } from 'chai'
 import 'mocha'
-import Buffer from './buffer'
+import RouteShelf from '../../buffer/route-shelf'
 import { IncomingMessage } from 'http'
-import IResponse from '../interfaces/IResponse'
-import IRoute from '../interfaces/IRoute'
+import IResponse from '../../interfaces/IResponse'
+import IRoute from '../../interfaces/IRoute'
 
 describe('Buffer', () => {
 
   it('Inserting and getting item from buffer', async () => {
-    const buffer = new Buffer()
-    buffer.setItem('1', {
-      path: '/oi', method: 'POST', handler: {
-        handle (req: IncomingMessage): Promise<IResponse> {
-          return new Promise(resolve => {
-            resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-          })
-        }
-      }
-    })
+    const buffer = new RouteShelf()
+    buffer.setItem('1', getMockRoute())
     let item: IRoute[] = buffer.getItems('1', '/oi')
     let control: number = 0
     expect(item.length).to.equal(1)
@@ -32,25 +24,9 @@ describe('Buffer', () => {
     expect(control).to.equal(1)
   })
   it('Inserting repeated item on buffer', async () => {
-    const buffer = new Buffer()
-    buffer.setItem('1', {
-      path: '/oi', method: 'POST', handler: {
-        handle (req: IncomingMessage): Promise<IResponse> {
-          return new Promise(resolve => {
-            resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-          })
-        }
-      }
-    })
-    buffer.setItem('1', {
-      path: '/oi', method: 'POST', handler: {
-        handle (req: IncomingMessage): Promise<IResponse> {
-          return new Promise(resolve => {
-            resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-          })
-        }
-      }
-    })
+    const buffer = new RouteShelf()
+    buffer.setItem('1', getMockRoute())
+    buffer.setItem('1', getMockRoute())
     let item: IRoute[] = buffer.getItems('1', '/oi')
     let control: number = 0
     expect(item.length).to.equal(1)
@@ -69,18 +45,22 @@ describe('Buffer', () => {
 
   })
   it('Getting a deleted item', () => {
-    const buffer = new Buffer()
-    buffer.setItem('1', {
-      path: '/oi', method: 'POST', handler: {
-        handle (req: IncomingMessage): Promise<IResponse> {
-          return new Promise(resolve => {
-            resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-          })
-        }
-      }
-    })
+    const buffer = new RouteShelf()
+    buffer.setItem('1', getMockRoute())
     expect(JSON.stringify(buffer.getItems('1', '/oi'))).to.not.undefined
     buffer.removeItem('1', '/oi', 'POST')
     expect(buffer.getItems('1', '/oi')).to.be.undefined
   })
 })
+
+function getMockRoute (): IRoute {
+  return {
+    path: '/oi', method: 'POST', handler: {
+      handle (req: IncomingMessage): Promise<IResponse> {
+        return new Promise(resolve => {
+          resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
+        })
+      }
+    }
+  }
+}

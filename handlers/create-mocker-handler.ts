@@ -3,20 +3,20 @@ import IResponse from '../interfaces/IResponse'
 import { IncomingMessage } from 'http'
 import IHandler from '../interfaces/IHandler'
 import Mocker from '../mocker/mocker'
-import IBuffer from '../interfaces/IBuffer'
-import Buffer from '../buffer/buffer'
+import IRouteShelf from '../interfaces/IRouteShelf'
+import RouteShelf from '../buffer/route-shelf'
 import { DELETE, GET } from '../consts/methods-consts'
 
 export default class CreateMockerHandler implements IHandler {
   readonly hostname: string
   private portsRange: Array<number>
-  readonly buffer: IBuffer
+  readonly buffer: IRouteShelf
   private usedPorts: Array<number> = []
 
   constructor (portsRange: Array<number>) {
     this.hostname = '127.0.0.1'
     this.portsRange = portsRange
-    this.buffer = new Buffer()
+    this.buffer = new RouteShelf()
   }
 
   public handle (req: IncomingMessage): Promise<IResponse> {
@@ -42,7 +42,7 @@ export default class CreateMockerHandler implements IHandler {
             handle (req: IncomingMessage): Promise<IResponse> {
               return new Promise(resolve => {
                 resolve({ code: 204, jsend: undefined })
-                  mocker.stopServer()
+                mocker.stopServer()
               })
             }
           }
