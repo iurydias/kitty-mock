@@ -7,7 +7,7 @@
     "start": "node main.js",
     "test:unit": "mocha -r ts-node/register tests/unit/*.test.ts",
     "test:functional": "mocha -r ts-node/register tests/functional/*.test.ts",
-    "test": "npm run -s test:unit && npm run -s tesat:functional"
+    "test": "npm run -s test:unit && npm run -s test:functional"
   },
   "repository": {
     "type": "git",
