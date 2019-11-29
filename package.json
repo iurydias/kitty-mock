@@ -5,7 +5,9 @@
   "main": "server.ts",
   "scripts": {
     "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:unit": "mocha -r ts-node/register tests/unit/*.test.ts",
+    "test:functional": "mocha -r ts-node/register tests/functional/*.test.ts",
+    "test": "npm run -s test:unit && npm run -s tesat:functional"
   },
   "repository": {
     "type": "git",
