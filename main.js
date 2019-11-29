@@ -1,6 +1,7 @@
 require('ts-node').register()
-let server = require('./server')
+let server = require('./server').default
 require('dotenv').config()
+let {KITTY} = require('./consts/kitty')
 
 let config = {
   host: process.env.HOST,
@@ -8,6 +9,6 @@ let config = {
   mockersPortsRange: process.env.MOCKER_PORTS_RANGE
 }
 
-server(config).catch((err) => {
-  console.log(err)
-})
+server(config)
+  .then(()=> console.log(KITTY + ' Kitty Mocker main server started.'))
+  .catch(console.error)

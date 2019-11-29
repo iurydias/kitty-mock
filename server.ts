@@ -1,5 +1,5 @@
 import IRouteShelf from './interfaces/IRouteShelf'
-import RouteShelf from './buffer/route-shelf'
+import RouteShelf from './routeShelf/route-shelf'
 import Mocker from './mocker/mocker'
 import CreateMockerHandler from './handlers/create-mocker-handler'
 import { POST } from './consts/methods-consts'
@@ -7,7 +7,7 @@ import { range } from 'lodash'
 import IMocker from './interfaces/IMocker'
 import IConfig from './interfaces/IConfig'
 
-let buffer: IRouteShelf = new RouteShelf()
+let routeShelf: IRouteShelf = new RouteShelf()
 
 export default function server (config: IConfig): Promise<IMocker> {
   return new Promise((resolve, reject) => {
@@ -19,18 +19,14 @@ export default function server (config: IConfig): Promise<IMocker> {
       return reject(err)
     }
     let portsRange = getPortsArray(rangeArray)
-    const server = new Mocker(host, Number(port), buffer)
+    const server = new Mocker(host, port, routeShelf)
     server.loadServer()
     server.runServer().then((res) => {
-      let createMockerHandler = new CreateMockerHandler(range(portsRange[0], portsRange[1], 1)
-      )
       server.addRoute({
-        path: '/create', method: POST, handler: createMockerHandler
+        path: '/create', method: POST, handler: new CreateMockerHandler(range(portsRange[0], portsRange[1], 1))
       })
       resolve(server)
-    }).catch((error) => {
-      reject(error)
-    })
+    }).catch(reject)
   })
 }
 

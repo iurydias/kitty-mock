@@ -4,19 +4,19 @@ import { IncomingMessage } from 'http'
 import IHandler from '../interfaces/IHandler'
 import Mocker from '../mocker/mocker'
 import IRouteShelf from '../interfaces/IRouteShelf'
-import RouteShelf from '../buffer/route-shelf'
+import RouteShelf from '../routeShelf/route-shelf'
 import { DELETE, GET } from '../consts/methods-consts'
 
 export default class CreateMockerHandler implements IHandler {
   readonly hostname: string
-  private portsRange: Array<number>
-  readonly buffer: IRouteShelf
-  private usedPorts: Array<number> = []
+  private portsRange: Array<string>
+  readonly routeShelf: IRouteShelf
+  private usedPorts: Array<string> = []
 
-  constructor (portsRange: Array<number>) {
+  constructor (portsRange: Array<string>) {
     this.hostname = '127.0.0.1'
     this.portsRange = portsRange
-    this.buffer = new RouteShelf()
+    this.routeShelf = new RouteShelf()
   }
 
   public handle (req: IncomingMessage): Promise<IResponse> {
@@ -25,7 +25,7 @@ export default class CreateMockerHandler implements IHandler {
       if (!port) {
         resolve({ code: 500, jsend: getJsend(500, undefined, 'internal server error') })
       }
-      const mocker = new Mocker(this.hostname, port, this.buffer)
+      const mocker = new Mocker(this.hostname, port, this.routeShelf)
       mocker.loadServer()
       mocker.runServer().then(() => {
         mocker.addRoute({
@@ -57,8 +57,8 @@ export default class CreateMockerHandler implements IHandler {
     })
   }
 
-  private getPort (): number | undefined {
-    let portsRange = this.portsRange.filter((num) => !this.usedPorts.includes(num))
+  private getPort (): string | undefined {
+    let portsRange: Array<string> = this.portsRange.filter((num) => !this.usedPorts.includes(num))
     let index: number = Math.floor(Math.random() * portsRange.length)
     return portsRange[index]
   }

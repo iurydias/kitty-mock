@@ -3,15 +3,15 @@ import 'mocha'
 import Mocker from '../../mocker/mocker'
 import IResponse from '../../interfaces/IResponse'
 import axios from 'axios'
-import RouteShelf from '../../buffer/route-shelf'
+import RouteShelf from '../../routeShelf/route-shelf'
 import { IncomingMessage } from 'http'
 import IRoute from '../../interfaces/IRoute'
 
 describe('Mocker', () => {
 
   it('Creating route', async () => {
-    let buffer = new RouteShelf()
-    const mocker = new Mocker('127.0.0.1', 5008, buffer)
+    let routeShelf = new RouteShelf()
+    const mocker = new Mocker('127.0.0.1', "5008", routeShelf)
     mocker.loadServer()
     await mocker.runServer()
     mocker.addRoute(getMockRoute())
@@ -32,8 +32,8 @@ describe('Mocker', () => {
     await mocker.stopServer()
   })
   it('Stopping server', async () => {
-    let buffer = new RouteShelf()
-    const mocker = new Mocker('127.0.0.1', 5009, buffer)
+    let routeShelf = new RouteShelf()
+    const mocker = new Mocker('127.0.0.1', "5009", routeShelf)
     mocker.loadServer()
     await mocker.runServer()
     mocker.addRoute(getMockRoute())

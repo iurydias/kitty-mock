@@ -8,7 +8,7 @@ import { inRange } from 'lodash'
 describe('Testing create mocker handler', () => {
 
   it('Creating a mocker', async () => {
-    let response: IResponse = await new CreateMockerHandler([5006, 5010]).handle(undefined)
+    let response: IResponse = await new CreateMockerHandler(["5006", "5010"]).handle(undefined)
     expect(response.code).to.equal(200)
     expect(response.jsend.status).to.equal('success')
     expect(response.jsend.message).to.equal('mocker successfully created')
@@ -18,7 +18,7 @@ describe('Testing create mocker handler', () => {
     await deleteMocker(data.port)
   })
   it('Deleting a mocker', async () => {
-    let response: IResponse = await new CreateMockerHandler([5010, 5014]).handle(undefined)
+    let response: IResponse = await new CreateMockerHandler(["5010", "5014"]).handle(undefined)
     expect(response.code).to.equal(200)
     expect(response.jsend.status).to.equal('success')
     expect(response.jsend.message).to.equal('mocker successfully created')

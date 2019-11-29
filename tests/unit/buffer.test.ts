@@ -1,55 +1,33 @@
 import { expect } from 'chai'
 import 'mocha'
-import RouteShelf from '../../buffer/route-shelf'
+import RouteShelf from '../../routeShelf/route-shelf'
 import { IncomingMessage } from 'http'
 import IResponse from '../../interfaces/IResponse'
 import IRoute from '../../interfaces/IRoute'
+import IRouteShelf from '../../interfaces/IRouteShelf'
 
-describe('Buffer', () => {
+describe('Route Shelf', () => {
 
-  it('Inserting and getting item from buffer', async () => {
-    const buffer = new RouteShelf()
-    buffer.setItem('1', getMockRoute())
-    let item: IRoute[] = buffer.getItems('1', '/oi')
-    let control: number = 0
-    expect(item.length).to.equal(1)
-    expect(item[0].path).to.equal('/oi')
-    expect(item[0].method).to.equal('POST')
-    await item[0].handler.handle(undefined).then(
-      (response) => {
-        expect(JSON.stringify(response)).to.equal('{"code":200,"jsend":{"status":"success","data":"oi","message":"oioi"}}')
-        control++
-      }
-    )
-    expect(control).to.equal(1)
+  it('Inserting and getting item from route shelf', async () => {
+    const routeShelf = new RouteShelf()
+    routeShelf.setItem('1', getMockRoute())
+    await getAndCheckItem(routeShelf)
   })
-  it('Inserting repeated item on buffer', async () => {
-    const buffer = new RouteShelf()
-    buffer.setItem('1', getMockRoute())
-    buffer.setItem('1', getMockRoute())
-    let item: IRoute[] = buffer.getItems('1', '/oi')
-    let control: number = 0
-    expect(item.length).to.equal(1)
-    expect(item[0].path).to.equal('/oi')
-    expect(item[0].method).to.equal('POST')
-    await item[0].handler.handle(undefined).then(
-      (response) => {
-        expect(JSON.stringify(response)).to.equal('{"code":200,"jsend":{"status":"success","data":"oi","message":"oioi"}}')
-        control++
-      }
-    )
-    expect(control).to.equal(1)
-    buffer.removeItem('1', '/oi', 'POST')
-    item = buffer.getItems('1', '/oi')
-    expect(item).to.equal(undefined)
+  it('Inserting repeated item on route shelf', async () => {
+    const routeShelf = new RouteShelf()
+    routeShelf.setItem('1', getMockRoute())
+    routeShelf.setItem('1', getMockRoute())
+    await getAndCheckItem(routeShelf)
+    routeShelf.removeItem('1', '/oi', 'POST')
+    await getInexistentItem(routeShelf)
 
   })
-  it('Getting a deleted item', () => {
-    const buffer = new RouteShelf()
-    buffer.setItem('1', getMockRoute())
-    expect(JSON.stringify(buffer.getItems('1', '/oi'))).to.not.undefined
-    buffer.removeItem('1', '/oi', 'POST')
-    expect(buffer.getItems('1', '/oi')).to.be.undefined
+  it('Getting a deleted item', async () => {
+    const routeShelf = new RouteShelf()
+    routeShelf.setItem('1', getMockRoute())
+    await getAndCheckItem(routeShelf)
+    routeShelf.removeItem('1', '/oi', 'POST')
+    await getInexistentItem(routeShelf)
   })
 })
 
@@ -63,4 +41,38 @@ function getMockRoute (): IRoute {
       }
     }
   }
+}
+
+async function getAndCheckItem (routeShelf: IRouteShelf) {
+  let success: number = 0
+  let fail: number = 0
+  await routeShelf.getItem('1', '/oi', 'POST').then(async route => {
+    let control: number = 0
+    expect(route.path).to.equal('/oi')
+    expect(route.method).to.equal('POST')
+    await route.handler.handle(undefined).then(
+      (response) => {
+        expect(JSON.stringify(response)).to.equal('{"code":200,"jsend":{"status":"success","data":"oi","message":"oioi"}}')
+        control++
+      }
+    )
+    expect(control).to.equal(1)
+    success++
+  }).catch(() => fail++)
+  expect(success).to.equal(1)
+  expect(fail).to.equal(0)
+}
+
+async function getInexistentItem (routeShelf: IRouteShelf) {
+  let success: number = 0
+  let fail: number = 0
+  await routeShelf.getItem('1', '/oi', 'POST')
+    .then(() => success++)
+    .catch(code => {
+        expect(code).to.equal(404)
+        fail++
+      }
+    )
+  expect(success).to.equal(0)
+  expect(fail).to.equal(1)
 }

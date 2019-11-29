@@ -5,18 +5,27 @@ import IRouteShelf from '../interfaces/IRouteShelf'
 export default class RouteShelf implements IRouteShelf {
   private mockerRoutesList: IMockerRouter[] = []
 
-  public getItems (mockerPort: string, routePath: string): IRoute[] | undefined {
-    let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
-      return mocker.mockerPort == mockerPort
-    })
-    if (mocker) {
-      let routes: IRoute[] = mocker.routesList.filter((route) => {
-        return route.path == routePath
+  public getItem (mockerPort: string, path: string, method: string): Promise<IRoute> {
+    return new Promise((resolve, reject) => {
+      let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
+        return mocker.mockerPort == mockerPort
       })
-      if (routes.length != 0) {
-        return routes
+      if (mocker) {
+        let routes: IRoute[] = mocker.routesList.filter((route) => {
+          return route.path == path
+        })
+        if (routes.length == 0) {
+         return reject(404)
+        }
+        let route: IRoute = routes.find((route) => {
+          return route.method == method
+        })
+        if (route) {
+          return resolve(route)
+        }
+        reject(405)
       }
-    }
+    })
   }
 
   public setItem (mockerPort: string, route: IRoute): boolean {
