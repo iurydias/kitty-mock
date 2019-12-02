@@ -6,11 +6,11 @@ test-unit:
   image: node:lts
   script:
     - npm install
-    - npm test:unit
+    - npm run test:unit
 
 test-functional:
   stage: tests
   image: node:lts
   script:
     - npm install
-    - npm test:functional
+    - npm run test:functional
