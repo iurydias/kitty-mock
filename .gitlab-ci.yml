@@ -1,0 +1,16 @@
+stages:
+  - tests
+
+test-unit:
+  stage: tests
+  image: node:lts
+  script:
+    - npm install
+    - npm run test:unit
+
+test-functional:
+  stage: tests
+  image: node:lts
+  script:
+    - npm install
+    - npm run test:functional
