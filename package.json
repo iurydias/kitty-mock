@@ -1,0 +1,42 @@
+{
+  "name": "kitty-mock",
+  "version": "0.0.1",
+  "description": "API Mocker",
+  "main": "server.ts",
+  "scripts": {
+    "start": "node main.js",
+    "test:unit": "mocha -r ts-node/register tests/unit/*.test.ts",
+    "test:functional": "mocha -r ts-node/register tests/functional/*.test.ts",
+    "test": "npm run -s test:unit && npm run -s test:functional"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/nTopus/kitty-mock.git"
+  },
+  "keywords": [
+    "api",
+    "mock",
+    "server"
+  ],
+  "author": "nTopus Possibilidades",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/nTopus/kitty-mock/issues"
+  },
+  "homepage": "https://gitlab.com/nTopus/kitty-mock#readme",
+  "dependencies": {
+    "@types/node": "^12.12.7",
+    "chalk": "^3.0.0",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.15",
+    "typescript": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.5",
+    "@types/mocha": "^5.2.7",
+    "axios": "^0.19.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "ts-node": "^8.5.0"
+  }
+}
