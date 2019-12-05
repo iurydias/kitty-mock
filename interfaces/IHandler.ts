@@ -1,6 +1,7 @@
 import { IncomingMessage } from 'http'
+import IJsend from './IJsend'
 import IResponse from './IResponse'
 
 export default interface IHandler {
-  handle (req: IncomingMessage): Promise<IResponse>
+   (req: IncomingMessage): Promise<IResponse>
 }

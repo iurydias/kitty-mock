@@ -11,7 +11,7 @@ describe('Mocker', () => {
 
   it('Creating route', async () => {
     let routeShelf = new RouteShelf()
-    const mocker = new Mocker('127.0.0.1', "5008", routeShelf)
+    const mocker = new Mocker('127.0.0.1', 5008, routeShelf)
     mocker.loadServer()
     await mocker.runServer()
     mocker.addRoute(getMockRoute())
@@ -28,12 +28,12 @@ describe('Mocker', () => {
       })
     expect(failed).to.equal(0)
     expect(success).to.equal(1)
-    expect(responseData).to.equal('{"status":"success","data":"oi","message":"oioi"}')
+    expect(responseData).to.equal("\"oioi\"")
     await mocker.stopServer()
   })
   it('Stopping server', async () => {
     let routeShelf = new RouteShelf()
-    const mocker = new Mocker('127.0.0.1', "5009", routeShelf)
+    const mocker = new Mocker('127.0.0.1', 5009, routeShelf)
     mocker.loadServer()
     await mocker.runServer()
     mocker.addRoute(getMockRoute())
@@ -55,12 +55,7 @@ describe('Mocker', () => {
 
 function getMockRoute (): IRoute {
   return {
-    path: '/oi', method: 'GET', handler: {
-      handle (req: IncomingMessage): Promise<IResponse> {
-        return new Promise(resolve => {
-          resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-        })
-      }
-    }
+    filters: {path: '/oi', method: 'GET'},
+    response: {code: 200, body: "oioi"}
   }
 }

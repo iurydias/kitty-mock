@@ -5,9 +5,12 @@
   "main": "server.ts",
   "scripts": {
     "start": "node main.js",
-    "test:unit": "mocha -r ts-node/register tests/unit/*.test.ts",
-    "test:functional": "mocha -r ts-node/register tests/functional/*.test.ts",
-    "test": "npm run -s test:unit && npm run -s test:functional"
+    "test:mocha": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"CommonJS\"}' mocha $npm_package_config_mocha_reqs",
+    "test:unit": "npm -s run test:mocha -- --reporter progress tests/unit/*.test.ts",
+    "test:unit:watch": "npm -s run test:mocha -- --watch --reporter progress tests/unit/*.test.ts",
+    "test:functional": "npm -s run test:mocha -- --reporter progress tests/functional/*.test.ts",
+    "test:functional:watch": "npm -s run test:mocha -- --watch --reporter progress tests/functional/*.test.ts",
+    "test": "npm -s run test:functional && test:unit"
   },
   "repository": {
     "type": "git",
@@ -18,6 +21,9 @@
     "mock",
     "server"
   ],
+  "config": {
+    "mocha_reqs": "-r ts-node/register -r chai/register-assert -r chai/register-should -r chai/register-expect --extension js,ts"
+  },
   "author": "nTopus Possibilidades",
   "license": "ISC",
   "bugs": {
@@ -28,6 +34,7 @@
     "@types/node": "^12.12.7",
     "chalk": "^3.0.0",
     "dotenv": "^8.2.0",
+    "flatted": "^2.0.1",
     "lodash": "^4.17.15",
     "typescript": "^3.7.2"
   },

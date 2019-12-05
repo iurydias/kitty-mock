@@ -1,7 +1,6 @@
-import IJsend from '../interfaces/IJsend'
 import { StatusError, StatusFail, StatusSuccess } from '../consts/jsend-consts'
 
-export default function getJsend (statusCode: number, data: string | undefined, message: string | undefined): IJsend {
+export default function getJsend ({ statusCode, data, message }): string {
   let statusString: string = StatusSuccess
   switch (true) {
     case (statusCode >= 500):
@@ -9,5 +8,5 @@ export default function getJsend (statusCode: number, data: string | undefined, 
     case (statusCode >= 400 && statusCode < 500):
       statusString = StatusFail
   }
-  return { status: statusString, data: data, message: message }
+  return JSON.stringify({ status: statusString, data: data, message: message })
 }

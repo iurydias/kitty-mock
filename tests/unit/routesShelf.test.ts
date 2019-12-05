@@ -18,7 +18,7 @@ describe('Route Shelf', () => {
     routeShelf.setItem('1', getMockRoute())
     routeShelf.setItem('1', getMockRoute())
     await getAndCheckItem(routeShelf)
-    routeShelf.removeItem('1', '/oi', 'POST')
+    expect(routeShelf.removeItem('1', '/oi', 'POST')).to.true
     await getInexistentItem(routeShelf)
 
   })
@@ -26,20 +26,15 @@ describe('Route Shelf', () => {
     const routeShelf = new RouteShelf()
     routeShelf.setItem('1', getMockRoute())
     await getAndCheckItem(routeShelf)
-    routeShelf.removeItem('1', '/oi', 'POST')
+    expect(routeShelf.removeItem('1', '/oi', 'POST')).to.true
     await getInexistentItem(routeShelf)
   })
 })
 
 function getMockRoute (): IRoute {
   return {
-    path: '/oi', method: 'POST', handler: {
-      handle (req: IncomingMessage): Promise<IResponse> {
-        return new Promise(resolve => {
-          resolve({ code: 200, jsend: { status: 'success', data: 'oi', message: 'oioi' } })
-        })
-      }
-    }
+    filters: { path: '/oi', method: 'POST' },
+    response: { code: 200, body: 'oioi' }
   }
 }
 
@@ -47,16 +42,12 @@ async function getAndCheckItem (routeShelf: IRouteShelf) {
   let success: number = 0
   let fail: number = 0
   await routeShelf.getItem('1', '/oi', 'POST').then(async route => {
-    let control: number = 0
-    expect(route.path).to.equal('/oi')
-    expect(route.method).to.equal('POST')
-    await route.handler.handle(undefined).then(
-      (response) => {
-        expect(JSON.stringify(response)).to.equal('{"code":200,"jsend":{"status":"success","data":"oi","message":"oioi"}}')
-        control++
-      }
-    )
-    expect(control).to.equal(1)
+    expect(route.filters.path).to.equal('/oi')
+    expect(route.filters.method).to.equal('POST')
+    if(typeof route.response != "function"){
+      expect(route.response.code).to.equal(200)
+      expect(route.response.body).to.equal("oioi")
+    }
     success++
   }).catch(() => fail++)
   expect(success).to.equal(1)

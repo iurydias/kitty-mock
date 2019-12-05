@@ -1,7 +1,8 @@
 import IHandler from './IHandler'
+import IFilter from './IFilter'
+import IResponse from './IResponse'
 
-export default interface IRoute {
-  path: string
-  method: string
-  handler: IHandler
+export default interface IRequest {
+  filters: IFilter,
+  response: IResponse | IHandler
 }
