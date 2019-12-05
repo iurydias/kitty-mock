@@ -1,10 +1,8 @@
 import { expect } from 'chai'
 import 'mocha'
 import Mocker from '../../mocker/mocker'
-import IResponse from '../../interfaces/IResponse'
 import axios from 'axios'
 import RouteShelf from '../../routeShelf/route-shelf'
-import { IncomingMessage } from 'http'
 import IRoute from '../../interfaces/IRoute'
 
 describe('Mocker', () => {
@@ -28,7 +26,7 @@ describe('Mocker', () => {
       })
     expect(failed).to.equal(0)
     expect(success).to.equal(1)
-    expect(responseData).to.equal("\"oioi\"")
+    expect(responseData).to.equal('"oioi"')
     await mocker.stopServer()
   })
   it('Stopping server', async () => {
@@ -55,7 +53,7 @@ describe('Mocker', () => {
 
 function getMockRoute (): IRoute {
   return {
-    filters: {path: '/oi', method: 'GET'},
-    response: {code: 200, body: "oioi"}
+    filters: { path: '/oi', method: 'GET' },
+    response: { code: 200, body: 'oioi' }
   }
 }

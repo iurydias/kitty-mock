@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import 'mocha'
 import IResponse from '../../interfaces/IResponse'
 import axios from 'axios'
-import { createServer, IncomingMessage, Server } from 'http'
+import { createServer, Server } from 'http'
 import IRoute from '../../interfaces/IRoute'
 import IRouteShelf from '../../interfaces/IRouteShelf'
 import RouteShelf from '../../routeShelf/route-shelf'
@@ -30,6 +30,7 @@ describe('Delete route handler', () => {
     axios.delete('http://127.0.0.1:5019?path=/oi&method=GET').finally(() => {
       expect(success).to.equal(1)
       expect(failed).to.equal(0)
+      server.close()
       done()
     })
   })
@@ -40,7 +41,7 @@ describe('Delete route handler', () => {
     const handler = new DeleteRouteHandler(routeShelf)
     let server: Server = createServer((req, res) => {
       handler.handle(req).then((response) => {
-        checkResponse(response, 'fail', "route does not exist", 404)
+        checkResponse(response, 'fail', 'route does not exist', 404)
         success++
       }).catch(() => {
         failed++
@@ -52,6 +53,8 @@ describe('Delete route handler', () => {
     axios.delete('http://127.0.0.1:5020?path=/oi&method=GET').finally(() => {
       expect(success).to.equal(1)
       expect(failed).to.equal(0)
+      server.close()
+
       done()
     })
   })
@@ -68,7 +71,7 @@ async function checkResponse (response: IResponse, status: string, message: stri
 
 function getMockRoute (): IRoute {
   return {
-    filters: {path: '/oi', method: 'GET'},
-    response: {code: 200, body: "oioi"}
+    filters: { path: '/oi', method: 'GET' },
+    response: { code: 200, body: 'oioi' }
   }
 }

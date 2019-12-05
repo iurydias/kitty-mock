@@ -10,7 +10,7 @@
     "test:unit:watch": "npm -s run test:mocha -- --watch --reporter progress tests/unit/*.test.ts",
     "test:functional": "npm -s run test:mocha -- --reporter progress tests/functional/*.test.ts",
     "test:functional:watch": "npm -s run test:mocha -- --watch --reporter progress tests/functional/*.test.ts",
-    "test": "npm -s run test:functional && test:unit"
+    "test": "npm -s run test:functional && npm -s run test:unit"
   },
   "repository": {
     "type": "git",

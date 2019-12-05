@@ -70,7 +70,7 @@ describe('Server teste 1', () => {
           port: port,
           path: '/oi',
           expectedCode: 200,
-          expectedResponse: "\"sddfsdf\""
+          expectedResponse: '"sddfsdf"'
         }).then(async () => {
           await deleteARoute(port, { path: '/oi', method: 'POST' }).then(async () => {
             await requestToADeletedRoute('POST', { port: port, path: '/oi', expectedCode: 404 }).then(async () => {
@@ -89,6 +89,8 @@ describe('Server teste 1', () => {
           path: '/=^.^=/route',
           expectedCode: 200,
           expectedResponse: '{"status":"success","data":"[{\\"path\\":\\"/\\",\\"method\\":\\"GET\\"},{\\"path\\":\\"/\\",\\"method\\":\\"DELETE\\"},{\\"path\\":\\"/oi\\",\\"method\\":\\"POST\\"}]"}'
+        }).finally(async ()=>{
+          await deleteMocker(port)
         })
       })
     })

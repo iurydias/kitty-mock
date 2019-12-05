@@ -3,7 +3,7 @@ import 'mocha'
 import IResponse from '../../interfaces/IResponse'
 import axios from 'axios'
 import CreateRouteHandler from '../../handlers/create-route-handler'
-import { createServer, IncomingMessage, Server } from 'http'
+import { createServer, Server } from 'http'
 import IRoute from '../../interfaces/IRoute'
 import IRouteShelf from '../../interfaces/IRouteShelf'
 import RouteShelf from '../../routeShelf/route-shelf'
@@ -117,7 +117,7 @@ async function checkResponse (response: IResponse, status: string, message: stri
 
 function getMockRoute (): IRoute {
   return {
-  filters: {path: '/oi', method: 'GET'},
-    response: {code: 200, body: "oioi"}
+    filters: { path: '/oi', method: 'GET' },
+    response: { code: 200, body: 'oioi' }
   }
 }

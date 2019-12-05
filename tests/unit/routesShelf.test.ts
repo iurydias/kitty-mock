@@ -1,8 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
 import RouteShelf from '../../routeShelf/route-shelf'
-import { IncomingMessage } from 'http'
-import IResponse from '../../interfaces/IResponse'
 import IRoute from '../../interfaces/IRoute'
 import IRouteShelf from '../../interfaces/IRouteShelf'
 
@@ -44,9 +42,9 @@ async function getAndCheckItem (routeShelf: IRouteShelf) {
   await routeShelf.getItem('1', '/oi', 'POST').then(async route => {
     expect(route.filters.path).to.equal('/oi')
     expect(route.filters.method).to.equal('POST')
-    if(typeof route.response != "function"){
+    if (typeof route.response != 'function') {
       expect(route.response.code).to.equal(200)
-      expect(route.response.body).to.equal("oioi")
+      expect(route.response.body).to.equal('oioi')
     }
     success++
   }).catch(() => fail++)
