@@ -53,18 +53,18 @@ describe('Server teste 1', () => {
         expect(failed).to.equal(0)
         expect(success).to.equal(1)
     })
-    it('Request to mocker server root with unacceptable methods', async () => {
-        await makeRequestToServerRoot('put')
-        await makeRequestToServerRoot('delete')
-        await makeRequestToServerRoot('get')
-        await makeRequestToServerRoot('patch')
+    it('Request to mocker server root with unacceptable methods', () => {
+        makeRequestToServerRoot('put')
+        makeRequestToServerRoot('delete')
+        makeRequestToServerRoot('get')
+        makeRequestToServerRoot('patch')
     })
     it('Request to mocker server with unacceptable methods', async () => {
         let port: string = await createANewMocker('4000', [5000, 6000])
-        await makeRequestToServer('put', port)
-        await makeRequestToServer('post', port)
-        await makeRequestToServer('patch', port)
-        await deleteMocker(port)
+        makeRequestToServer('put', port)
+        makeRequestToServer('post', port)
+        makeRequestToServer('patch', port)
+        deleteMocker(port)
     })
     it('Check server mocker functionality', async () => {
         await createANewMocker('4000', [5000, 6000]).then(async (port) => {
@@ -410,7 +410,8 @@ async function deleteMocker(port: string) {
         expect(response.status).to.equal(204)
         expect(response.data).to.equal('')
         success++
-    }).catch(() => {
+    }).catch((err) => {
+        console.log(err.response.data)
         failed++
     })
     expect(failed).to.equal(0)

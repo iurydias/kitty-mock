@@ -25,7 +25,7 @@ export default class RoutesGetterHandler {
 
 function hydrate(routes: IRoute[]): IFilter[] {
     let filteredRoutes: IRoute[] = routes.filter((route) => {
-        return route.filters.path != "/=%5E.%5E=/route"
+        return route.filters.path != "/=%5E.%5E=/route" && route.filters.path != "/=%5E.%5E=/history"
     })
     return filteredRoutes.map((route) => {
         return route.filters
