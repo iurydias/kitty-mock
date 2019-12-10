@@ -5,8 +5,10 @@ export default function getJsend ({ statusCode, data, message }): string {
   switch (true) {
     case (statusCode >= 500):
       statusString = StatusError
+      break
     case (statusCode >= 400 && statusCode < 500):
       statusString = StatusFail
+      break
   }
   return JSON.stringify({ status: statusString, data: data, message: message })
 }

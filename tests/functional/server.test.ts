@@ -5,6 +5,7 @@ import { inRange } from 'lodash'
 import server from '../../server'
 import IJsend from '../../interfaces/IJsend'
 import IMocker from '../../interfaces/IMocker'
+import IRoute from '../../interfaces/IRoute'
 
 describe('Server teste 1', () => {
   let server: IMocker
@@ -65,7 +66,8 @@ describe('Server teste 1', () => {
   })
   it('Check server mocker functionality', async () => {
     await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await createANewRoute(port).then(async () => {
+      let route: IRoute = { filters: {path: "/oi", method: "POST"}, response: {code: 200, body: "sddfsdf"}}
+      await createANewRoute(port,"success", 'route successfully created', 1, 0, route).then(async () => {
         await requestToARoute('POST', {
           port: port,
           path: '/oi',
@@ -83,7 +85,8 @@ describe('Server teste 1', () => {
   })
   it('Check server mocker routes ', async () => {
     await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await createANewRoute(port).then(async () => {
+      let route: IRoute = { filters: {path: "/oi", method: "POST"}, response: {code: 200, body: "sddfsdf"}}
+      await createANewRoute(port, "success", 'route successfully created',1,0, route).then(async () => {
         await requestToARoute('GET', {
           port: port,
           path: '/=^.^=/route',
@@ -92,6 +95,48 @@ describe('Server teste 1', () => {
         }).finally(async ()=>{
           await deleteMocker(port)
         })
+      })
+    })
+  })
+  it('Check server mocker creating repeated routes', async () => {
+    let route: IRoute = { filters: {path: "/oi", method: "POST"}, response: {code: 200, body: "sddfsdf"}}
+    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
+      await createANewRoute(port, "success",'route successfully created',1,0, route).then(async () => {
+        await createANewRoute(port , "fail", 'route already created in this mocker',0,1, route).finally(async ()=> {
+            await deleteMocker(port)
+        })
+      })
+    })
+  })
+  it('Check server mocker creating route with invalid path', async () => {
+    let route: IRoute = { filters: {path: "oi", method: "POST"}, response: {code: 200, body: "sddfsdf"}}
+    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
+      await createANewRoute(port, "fail",'request with invalid route path',0,1, route).then(async () => {
+          await deleteMocker(port)
+      })
+    })
+  })
+  it('Check server mocker creating route with invalid method', async () => {
+    let route: IRoute = { filters: {path: "/oi", method: "POsST"}, response: {code: 200, body: "sddfsdf"}}
+    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
+      await createANewRoute(port, "fail",'request with invalid route method',0,1, route).then(async () => {
+        await deleteMocker(port)
+      })
+    })
+  })
+  it('Check server mocker creating route with invalid code', async () => {
+    let route: IRoute = { filters: {path: "/oi", method: "POST"}, response: {code: 700, body: "sddfsdf"}}
+    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
+      await createANewRoute(port, "fail",'request with invalid route response code',0,1, route).then(async () => {
+        await deleteMocker(port)
+      })
+    })
+  })
+  it('Check server mocker creating route with invalid json', async () => {
+    let route: IRoute = { filters: {path: "/oi", method: "POST"}, response: {code: 700, body: "sddfsdf"}}
+    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
+      await tryCreateARouteWithInvalidJson(port, "error",'request missing body. Unexpected end of JSON input',0,1, route).then(async () => {
+        await deleteMocker(port)
       })
     })
   })
@@ -168,25 +213,44 @@ async function deleteARoute (port: string, { path, method }) {
 
 }
 
-async function createANewRoute (port: string) {
+async function createANewRoute (port: string, status: string, message: string, success: number, fail: number, route: IRoute) {
   let body: string = ''
-  let success: number = 0
-  let failed: number = 0
-  await axios.post('http://localhost:' + port + '/=^.^=/route', '{"filters":{"path":"/oi","method":"POST"},"response":{"code":200,"body":"sddfsdf"}}').then((response) => {
+  let successVar: number = 0
+  let failedVar: number = 0
+  await axios.post('http://localhost:' + port + '/=^.^=/route', JSON.stringify(route)).then((response) => {
     expect(response.status).to.equal(200)
     body = JSON.stringify(response.data)
-    success++
-  }).catch(() => {
-    failed++
+    successVar++
+  }).catch((error) => {
+    body = JSON.stringify(error.response.data)
+    failedVar++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
+  expect(failedVar).to.equal(fail)
+  expect(successVar).to.equal(success)
   let res: IJsend = JSON.parse(body)
-  expect(res.status).to.equal('success')
+  expect(res.status).to.equal(status)
   expect(res.data).to.be.undefined
-  expect(res.message).to.equal('route successfully created')
+  expect(res.message).to.equal(message)
 }
-
+async function tryCreateARouteWithInvalidJson (port: string, status: string, message: string, success: number, fail: number, route: IRoute) {
+  let body: string = ''
+  let successVar: number = 0
+  let failedVar: number = 0
+  await axios.post('http://localhost:' + port + '/=^.^=/route', `{"sdfsdf":100`).then((response) => {
+    expect(response.status).to.equal(200)
+    body = JSON.stringify(response.data)
+    successVar++
+  }).catch((error) => {
+    body = JSON.stringify(error.response.data)
+    failedVar++
+  })
+  expect(failedVar).to.equal(fail)
+  expect(successVar).to.equal(success)
+  let res: IJsend = JSON.parse(body)
+  expect(res.status).to.equal(status)
+  expect(res.data).to.be.undefined
+  expect(res.message).to.equal(message)
+}
 async function requestToARoute (method: Method, { port, path, expectedCode, expectedResponse }) {
   let body: string = ''
   let success: number = 0
