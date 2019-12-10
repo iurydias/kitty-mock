@@ -16,7 +16,7 @@ export default class CreateRouteHandler {
     public handle(req: IncomingMessage): Promise<IResponse> {
         return getRequestBody(req).then((body) => {
             let route: IRoute = JSON.parse(body)
-            route.response = <IResponse>route.response
+            route.response = route.response as IResponse
             let err: string | undefined = checkRequest(route.filters, route.response)
             if (err) {
                 return {code: 403, body: getJsend({statusCode: 403, data: undefined, message: err})}

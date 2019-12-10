@@ -6,15 +6,15 @@ import IRouteShelf from '../interfaces/IRouteShelf'
 import IFilter from '../interfaces/IFilter'
 
 export default class RoutesGetterHandler {
-    private mockerRoutesList: IRouteShelf
+    private mockerRouteShelf: IRouteShelf
 
     constructor(mockerRoutesList: IRouteShelf) {
-        this.mockerRoutesList = mockerRoutesList
+        this.mockerRouteShelf = mockerRoutesList
     }
 
     public handle(req: IncomingMessage): Promise<IResponse> {
         return new Promise((resolve) => {
-            let routes: IRoute[] | undefined = this.mockerRoutesList.getItems(req.socket.localPort.toString())
+            let routes: IRoute[] | undefined = this.mockerRouteShelf.getItems(req.socket.localPort.toString())
             resolve({
                 code: 200,
                 body: getJsend({statusCode: 200, data: JSON.stringify(hydrate(routes)), message: undefined})

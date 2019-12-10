@@ -7,19 +7,13 @@ export default class RouteShelf implements IRouteShelf {
 
     public getItem(mockerPort: string, path: string, method: string): Promise<IRoute> {
         return new Promise((resolve, reject) => {
-            let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
-                return mocker.mockerPort == mockerPort
-            })
+            let mocker: IMockerRouter = this.getMocker(mockerPort)
             if (mocker) {
-                let routes: IRoute[] = mocker.routesList.filter((route) => {
-                    return route.filters.path == path
-                })
+                let routes: IRoute[] = this.filterRoutesByPath(mocker.routesList, path)
                 if (routes.length == 0) {
                     return reject(404)
                 }
-                let route: IRoute = routes.find((route) => {
-                    return route.filters.method == method.toUpperCase()
-                })
+                let route: IRoute = this.getRouteByMethod(routes, method.toUpperCase())
                 if (route) {
                     return resolve(route)
                 }
@@ -29,9 +23,7 @@ export default class RouteShelf implements IRouteShelf {
     }
 
     public getItems(mockerPort: string): IRoute[] {
-        let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
-            return mocker.mockerPort == mockerPort
-        })
+        let mocker: IMockerRouter = this.getMocker(mockerPort)
         if (mocker) {
             return mocker.routesList
         }
@@ -40,13 +32,9 @@ export default class RouteShelf implements IRouteShelf {
 
     public setItem(mockerPort: string, route: IRoute): boolean {
         route.filters.method = route.filters.method.toUpperCase()
-        let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
-            return mocker.mockerPort == mockerPort
-        })
+        let mocker: IMockerRouter = this.getMocker(mockerPort)
         if (mocker) {
-            let routeItem: IRoute = mocker.routesList.find((routeItem) => {
-                return (routeItem.filters.path == route.filters.path && routeItem.filters.method == route.filters.method)
-            })
+            let routeItem: IRoute = this.getRouteByPathAndMethod(mocker.routesList, route.filters)
             if (!routeItem) {
                 mocker.routesList.push(route)
                 return true
@@ -58,18 +46,47 @@ export default class RouteShelf implements IRouteShelf {
     }
 
     public removeItem(mockerPort: string, routePath: string, routeMethod: string): boolean {
-        let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
-            return mocker.mockerPort == mockerPort
-        })
+        let mocker: IMockerRouter = this.getMocker(mockerPort)
         if (mocker) {
-            let route: IRoute = mocker.routesList.find((routeItem) => {
-                return (routeItem.filters.path == routePath && routeItem.filters.method == routeMethod.toUpperCase())
+            let routeItem: IRoute = this.getRouteByPathAndMethod(mocker.routesList, {
+                path: routePath,
+                method: routeMethod.toUpperCase()
             })
-            mocker.routesList = mocker.routesList.filter((routeItem) => {
-                return (routeItem.filters.path != routePath && routeItem.filters.method != routeMethod.toUpperCase())
+            mocker.routesList = this.filterRoutesByPathAndMethod(mocker.routesList, {
+                path: routeItem.filters.method,
+                method: routeMethod.toUpperCase()
             })
-            return !!route
+            return !!routeItem
         }
     }
 
+    private getMocker(port: string): IMockerRouter {
+        return this.mockerRoutesList.find((mocker) => {
+            return mocker.mockerPort == port
+        })
+    }
+
+    private filterRoutesByPath(routesList: IRoute[], path: string): IRoute[] {
+        return routesList.filter((route) => {
+            return route.filters.path == path
+        })
+    }
+
+    private filterRoutesByPathAndMethod(routesList: IRoute[], {path, method}): IRoute[] {
+        return routesList.filter((route) => {
+            return route.filters.path == path && route.filters.method == method
+        })
+    }
+
+    private getRouteByPathAndMethod(routesList: IRoute[], {path, method}): IRoute {
+        return routesList.find((routeItem) => {
+            return routeItem.filters.path == path && routeItem.filters.method == method
+        })
+    }
+
+    private getRouteByMethod(routesList: IRoute[], method): IRoute {
+        return routesList.find((routeItem) => {
+            return routeItem.filters.method == method
+        })
+    }
 }

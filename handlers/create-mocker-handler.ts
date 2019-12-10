@@ -10,17 +10,23 @@ import RoutesGetterHandler from './routes-getter-handler'
 import MockerHealthCheckerHandler from './mocker-health-checker-handler'
 import StopMockerHandler from './stop-mocker-handler'
 import IResponse from '../interfaces/IResponse'
+import IRequestShelf from "../interfaces/IRequestShelf";
+import RequestShelf from "../requestShelf/request-shelf";
+import HistoryGetterHandler from "./history-getter-handler";
+import DeleteHistoryHandler from "./delete-history-handler";
 
 export default class CreateMockerHandler {
     readonly hostname: string
     private portsRange: number[]
     readonly routeShelf: IRouteShelf
+    readonly requestShelf: IRequestShelf
     private usedPorts: number[] = []
 
     constructor(portsRange: number[]) {
         this.hostname = '127.0.0.1'
         this.portsRange = portsRange
         this.routeShelf = new RouteShelf()
+        this.requestShelf = new RequestShelf()
     }
 
     public handle(req: IncomingMessage): Promise<IResponse> {
@@ -46,6 +52,14 @@ export default class CreateMockerHandler {
                 mocker.addRoute({
                     filters: {path: '/=%5E.%5E=/route', method: DELETE},
                     response: DeleteRouteHandler.prototype.handle.bind(new DeleteRouteHandler(this.routeShelf))
+                })
+                mocker.addRoute({
+                    filters: {path: '/=%5E.%5E=/history', method: GET},
+                    response: HistoryGetterHandler.prototype.handle.bind(new HistoryGetterHandler(this.requestShelf))
+                })
+                mocker.addRoute({
+                    filters: {path: '/=%5E.%5E=/history', method: DELETE},
+                    response: DeleteHistoryHandler.prototype.handle.bind(new DeleteHistoryHandler(this.requestShelf))
                 })
                 mocker.addRoute({
                     filters: {path: '/', method: GET},

@@ -6,6 +6,8 @@ import server from '../../server'
 import IJsend from '../../interfaces/IJsend'
 import IMocker from '../../interfaces/IMocker'
 import IRoute from '../../interfaces/IRoute'
+import {GET, POST} from "../../consts/methods-consts";
+import IRequest from "../../interfaces/IRequest";
 
 describe('Server teste 1', () => {
     let server: IMocker
@@ -144,6 +146,27 @@ describe('Server teste 1', () => {
             })
         })
     })
+    it('Checking route history functionality', async () => {
+        await createANewMocker('4000', [5000, 6000]).then(async (port) => {
+            let route: IRoute = {filters: {path: "/oi", method: POST}, response: {code: 200, body: "sddfsdf"}}
+            await createANewRoute(port, "success", 'route successfully created', 1, 0, route).then(async () => {
+                await requestToARoute(POST, {
+                    port: port,
+                    path: '/oi',
+                    expectedCode: 200,
+                    expectedResponse: '"sddfsdf"'
+                }).then(async () => {
+                    await getAndCheckRouteHistory(port, {path: "/oi", method: POST}).then(async () => {
+                        await deleteRouteHistory(port, {path: "/oi", method: POST}).then(async () => {
+                            await getAndCheckEmptyRouteHistory(port, {path: "/oi", method: POST}).then(async () => {
+                                await deleteMocker(port)
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    })
 })
 
 async function runServer(host: string, port: string, portsRange: string): Promise<IMocker> {
@@ -214,7 +237,56 @@ async function deleteARoute(port: string, {path, method}) {
     })
     expect(failed).to.equal(0)
     expect(success).to.equal(1)
+}
 
+async function getAndCheckRouteHistory(port: string, {path, method}) {
+    let body: string = ''
+    let success: number = 0
+    let failed: number = 0
+    await axios.get(`http://localhost:${port}/=^.^=/history?path=${path}&method=${method}`).then((response) => {
+        expect(response.status).to.equal(204)
+        body = JSON.stringify(response.data)
+        success++
+    }).catch(() => {
+        failed++
+    })
+    expect(failed).to.equal(0)
+    expect(success).to.equal(1)
+    let res: IJsend = JSON.parse(body)
+    expect(res.status).to.equal('success')
+    let history: IRequest = JSON.parse(res.data)
+    expect(history.ip).to.equal("127.0.0.1")
+    expect(history.body).to.equal("oi")
+    expect(history.header).to.equal("")
+    expect(history.url).to.equal("/oi")
+    expect(history.method).to.equal(GET)
+}
+
+async function getAndCheckEmptyRouteHistory(port: string, {path, method}) {
+    let success: number = 0
+    let failed: number = 0
+    await axios.get(`http://localhost:${port}/=^.^=/history?path=${path}&method=${method}`).then((response) => {
+        expect(response.status).to.equal(204)
+        expect(response.data).to.equal("")
+        success++
+    }).catch(() => {
+        failed++
+    })
+    expect(failed).to.equal(0)
+    expect(success).to.equal(1)
+}
+
+async function deleteRouteHistory(port: string, {path, method}) {
+    let success: number = 0
+    let failed: number = 0
+    await axios.delete(`http://localhost:${port}/=^.^=/history?path=${path}&method=${method}`).then((response) => {
+        expect(response.status).to.equal(204)
+        success++
+    }).catch(() => {
+        failed++
+    })
+    expect(failed).to.equal(0)
+    expect(success).to.equal(1)
 }
 
 async function createANewRoute(port: string, status: string, message: string, success: number, fail: number, route: IRoute) {
