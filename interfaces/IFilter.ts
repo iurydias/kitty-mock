@@ -1,5 +1,4 @@
-
 export default interface IFilter {
-  path: string
-  method: string
+    path: string
+    method: string
 }
