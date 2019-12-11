@@ -1,6 +1,8 @@
-import IRequest from "./IRequest";
+import IRouteHistoryInfo from './IRouteHistoryInfo'
 
 export default interface IMockerHistory {
     mockerPort: string
-    requestList: IRequest[]
+    routeInfo: IRouteHistoryInfo[]
 }
+
+

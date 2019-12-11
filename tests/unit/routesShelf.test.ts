@@ -3,6 +3,7 @@ import 'mocha'
 import RouteShelf from '../../routeShelf/route-shelf'
 import IRoute from '../../interfaces/IRoute'
 import IRouteShelf from '../../interfaces/IRouteShelf'
+import { GET, POST } from '../../consts/methods-consts'
 
 describe('Route Shelf', () => {
 
@@ -16,16 +17,25 @@ describe('Route Shelf', () => {
         routeShelf.setItem('1', getMockRoute())
         routeShelf.setItem('1', getMockRoute())
         await getAndCheckItem(routeShelf)
-        expect(routeShelf.removeItem('1', '/oi', 'POST')).to.true
-        await getInexistentItem(routeShelf)
+        expect(routeShelf.removeItem('1', '/oi', POST)).to.true
+        await getInexistentItem(routeShelf,'/oi',  POST)
 
     })
     it('Getting a deleted item', async () => {
         const routeShelf = new RouteShelf()
         routeShelf.setItem('1', getMockRoute())
         await getAndCheckItem(routeShelf)
-        expect(routeShelf.removeItem('1', '/oi', 'POST')).to.true
-        await getInexistentItem(routeShelf)
+        expect(routeShelf.removeItem('1', '/oi', POST)).to.true
+        await getInexistentItem(routeShelf, '/oi', POST)
+    })
+    it('Deleting one item', async () => {
+        const routeShelf = new RouteShelf()
+        routeShelf.setItem('1', getMockRoute())
+        routeShelf.setItem('1', getMockRoute2())
+        await getAndCheckItem(routeShelf)
+        expect(routeShelf.removeItem('1', '/oii', GET)).to.true
+        await getInexistentItem(routeShelf, '/oii', GET)
+        await getAndCheckItem(routeShelf)
     })
 })
 
@@ -35,7 +45,12 @@ function getMockRoute(): IRoute {
         response: {code: 200, body: 'oioi'}
     }
 }
-
+function getMockRoute2(): IRoute {
+    return {
+        filters: {path: '/oii', method: 'GET'},
+        response: {code: 200, body: 'oioi'}
+    }
+}
 async function getAndCheckItem(routeShelf: IRouteShelf) {
     let success: number = 0
     let fail: number = 0
@@ -52,10 +67,10 @@ async function getAndCheckItem(routeShelf: IRouteShelf) {
     expect(fail).to.equal(0)
 }
 
-async function getInexistentItem(routeShelf: IRouteShelf) {
+async function getInexistentItem(routeShelf: IRouteShelf, path: string, method: string) {
     let success: number = 0
     let fail: number = 0
-    await routeShelf.getItem('1', '/oi', 'POST')
+    await routeShelf.getItem('1', path, method)
         .then(() => success++)
         .catch(code => {
                 expect(code).to.equal(404)

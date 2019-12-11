@@ -3,6 +3,7 @@ import {IncomingMessage} from 'http'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import IQuery from '../interfaces/IQuery'
 import IResponse from '../interfaces/IResponse'
+import { checkQuery } from '../helpers/check-query'
 
 export default class DeleteRouteHandler {
     private mockerRoutesList: IRouteShelf
@@ -29,10 +30,3 @@ export default class DeleteRouteHandler {
     }
 }
 
-function checkQuery(query: IQuery): string | undefined {
-    if (query.path == undefined) {
-        return 'request query missing path'
-    } else if (query.method == undefined) {
-        return 'request query missing method'
-    }
-}

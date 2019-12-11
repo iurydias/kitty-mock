@@ -82,6 +82,7 @@ describe('Server teste 1', () => {
                             path: '/oi',
                             expectedCode: 404
                         }).then(async () => {
+                            console.log(port)
                             await deleteMocker(port)
                         })
                     })

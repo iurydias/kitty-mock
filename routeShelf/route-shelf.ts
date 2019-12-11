@@ -52,10 +52,12 @@ export default class RouteShelf implements IRouteShelf {
                 path: routePath,
                 method: routeMethod.toUpperCase()
             })
-            mocker.routesList = this.filterRoutesByPathAndMethod(mocker.routesList, {
-                path: routeItem.filters.method,
-                method: routeMethod.toUpperCase()
-            })
+            if (routeItem) {
+                mocker.routesList = this.filterPathAndMethodDifferentsRoutes(mocker.routesList, {
+                    path: routeItem.filters.method,
+                    method: routeMethod.toUpperCase()
+                })
+            }
             return !!routeItem
         }
     }
@@ -72,9 +74,9 @@ export default class RouteShelf implements IRouteShelf {
         })
     }
 
-    private filterRoutesByPathAndMethod(routesList: IRoute[], {path, method}): IRoute[] {
+    private filterPathAndMethodDifferentsRoutes(routesList: IRoute[], {path, method}): IRoute[] {
         return routesList.filter((route) => {
-            return route.filters.path == path && route.filters.method == method
+            return route.filters.path != path && route.filters.method != method
         })
     }
 
