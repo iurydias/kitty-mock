@@ -4,4 +4,5 @@ export default interface IRequest {
     header: string
     url: string
     method: string
+    date: string
 }

@@ -8,6 +8,7 @@ import IMocker from '../../interfaces/IMocker'
 import IRoute from '../../interfaces/IRoute'
 import {GET, POST} from "../../consts/methods-consts";
 import IRequest from "../../interfaces/IRequest";
+import json = Mocha.reporters.json
 
 describe('Server teste 1', () => {
     let server: IMocker
@@ -82,7 +83,6 @@ describe('Server teste 1', () => {
                             path: '/oi',
                             expectedCode: 404
                         }).then(async () => {
-                            console.log(port)
                             await deleteMocker(port)
                         })
                     })
@@ -245,7 +245,7 @@ async function getAndCheckRouteHistory(port: string, {path, method}) {
     let success: number = 0
     let failed: number = 0
     await axios.get(`http://localhost:${port}/=^.^=/history?path=${path}&method=${method}`).then((response) => {
-        expect(response.status).to.equal(204)
+        expect(response.status).to.equal(200)
         body = JSON.stringify(response.data)
         success++
     }).catch(() => {
@@ -255,22 +255,24 @@ async function getAndCheckRouteHistory(port: string, {path, method}) {
     expect(success).to.equal(1)
     let res: IJsend = JSON.parse(body)
     expect(res.status).to.equal('success')
-    let history: IRequest = JSON.parse(res.data)
-    expect(history.ip).to.equal("127.0.0.1")
-    expect(history.body).to.equal("oi")
-    expect(history.header).to.equal("")
-    expect(history.url).to.equal("/oi")
-    expect(history.method).to.equal(GET)
+    let history: IRequest[] = JSON.parse(JSON.stringify(res.data))
+    expect(history[0].ip).to.equal("127.0.0.1")
+    expect(history[0].body).to.equal('')
+    expect(history[0].header).to.equal(undefined)
+    expect(history[0].url).to.equal("/oi")
+    expect(history[0].method).to.equal(POST)
+    expect(history[0].date).to.be.not.undefined
 }
 
 async function getAndCheckEmptyRouteHistory(port: string, {path, method}) {
     let success: number = 0
     let failed: number = 0
     await axios.get(`http://localhost:${port}/=^.^=/history?path=${path}&method=${method}`).then((response) => {
-        expect(response.status).to.equal(204)
-        expect(response.data).to.equal("")
+        expect(response.status).to.equal(200)
+        expect(JSON.stringify(response.data)).to.equal('{"status":"success","data":[]}')
         success++
-    }).catch(() => {
+    }).catch((err) => {
+        console.log(err)
         failed++
     })
     expect(failed).to.equal(0)

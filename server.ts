@@ -7,6 +7,8 @@ import {range} from 'lodash'
 import IMocker from './interfaces/IMocker'
 import IConfig from './interfaces/IConfig'
 import checkParamsConfig from './helpers/check-params-config'
+import RequestShelf from './requestShelf/request-shelf'
+import IRequestShelf from './interfaces/IRequestShelf'
 
 let routeShelf: IRouteShelf = new RouteShelf()
 
@@ -21,13 +23,14 @@ export default function server(config: IConfig): Promise<IMocker> {
                 return reject(err)
             }
         }
+        let requestShelf: IRequestShelf = new RequestShelf()
         const [portInit, portLimit] = getPortsArray(rangeArray)
-        const server = new Mocker(host, Number(port), routeShelf)
+        const server = new Mocker(host, Number(port), routeShelf, requestShelf)
         server.loadServer()
         server.runServer().then((res) => {
             server.addRoute({
                 filters: {path: '/create', method: POST},
-                response: CreateMockerHandler.prototype.handle.bind(new CreateMockerHandler(range(Number(portInit), Number(portLimit), 1)))
+                response: CreateMockerHandler.prototype.handle.bind(new CreateMockerHandler(range(Number(portInit), Number(portLimit), 1), requestShelf))
             })
             resolve(server)
         }).catch(reject)

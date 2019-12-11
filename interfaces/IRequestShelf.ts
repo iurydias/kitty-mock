@@ -1,10 +1,10 @@
-import IRequest from "./IRequest";
+import IRequest from './IRequest'
 
 export default interface IRequestShelf {
-    getRequests(mockerPort: string): IRequest[]
+  getRequests (mockerPort: string, routeId: string): IRequest[]
 
-    setRequest(mockerPort: string, request: IRequest): void
+  setRequest (mockerPort: string, routeId: string, request: IRequest): void
 
-    deleteRequests(mockerPort: string): void
+  deleteRequests (mockerPort: string, routeId: string): void
 
 }

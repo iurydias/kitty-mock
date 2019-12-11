@@ -11,7 +11,6 @@ import MockerHealthCheckerHandler from './mocker-health-checker-handler'
 import StopMockerHandler from './stop-mocker-handler'
 import IResponse from '../interfaces/IResponse'
 import IRequestShelf from "../interfaces/IRequestShelf";
-import RequestShelf from "../requestShelf/request-shelf";
 import HistoryGetterHandler from "./history-getter-handler";
 import DeleteHistoryHandler from "./delete-history-handler";
 
@@ -22,11 +21,11 @@ export default class CreateMockerHandler {
     readonly requestShelf: IRequestShelf
     private usedPorts: number[] = []
 
-    constructor(portsRange: number[]) {
+    constructor(portsRange: number[], requestShelf: IRequestShelf) {
         this.hostname = '127.0.0.1'
         this.portsRange = portsRange
         this.routeShelf = new RouteShelf()
-        this.requestShelf = new RequestShelf()
+        this.requestShelf = requestShelf
     }
 
     public handle(req: IncomingMessage): Promise<IResponse> {
@@ -38,7 +37,7 @@ export default class CreateMockerHandler {
                     body: getJsend({statusCode: 500, data: undefined, message: 'internal server error'})
                 })
             }
-            const mocker = new Mocker(this.hostname, port, this.routeShelf)
+            const mocker = new Mocker(this.hostname, port, this.routeShelf,  this.requestShelf)
             mocker.loadServer()
             mocker.runServer().then(() => {
                 mocker.addRoute({

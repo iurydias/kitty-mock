@@ -9,14 +9,30 @@ describe('Request Shelf', () => {
 
     it('Inserting and getting item from request shelf', () => {
         const requestShelf = new RequestShelf()
-        requestShelf.setRequest('1', getMockRequest())
-        getAndCheckRequests(requestShelf, "[{\"ip\":\"127.0.0.1\",\"header\":\"teste\",\"body\":\"oi\",\"method\":\"GET\",\"url\":\"/oi\"}]")
+        let request: IRequest = getMockRequest()
+        requestShelf.setRequest('1', "GET/oi",request)
+        getAndCheckRequests(requestShelf, JSON.stringify([request]))
     })
     it('Getting deleted requests from a mocker', () => {
         const requestShelf = new RequestShelf()
-        requestShelf.setRequest('1', getMockRequest())
-        getAndCheckRequests(requestShelf, "[{\"ip\":\"127.0.0.1\",\"header\":\"teste\",\"body\":\"oi\",\"method\":\"GET\",\"url\":\"/oi\"}]")
-        requestShelf.deleteRequests('1')
+        let request: IRequest = getMockRequest()
+        requestShelf.setRequest('1', "GET/oi", request)
+        getAndCheckRequests(requestShelf, JSON.stringify([request]))
+        requestShelf.deleteRequests('1', "GET/oi")
+        getAndCheckRequests(requestShelf, "[]")
+    })
+    it('Getting deleted requests from a mocker, setting and getting again', () => {
+        const requestShelf = new RequestShelf()
+        let request: IRequest = getMockRequest()
+        requestShelf.setRequest('1', "GET/oi", request)
+        getAndCheckRequests(requestShelf, JSON.stringify([request]))
+        requestShelf.deleteRequests('1', "GET/oi")
+        getAndCheckRequests(requestShelf, "[]")
+        requestShelf.setRequest('1', "GET/oi", request)
+        getAndCheckRequests(requestShelf, JSON.stringify([request]))
+    })
+    it('Getting requests from a empty mocker', () => {
+        const requestShelf = new RequestShelf()
         getAndCheckRequests(requestShelf, "[]")
     })
 })
@@ -27,12 +43,13 @@ function getMockRequest(): IRequest {
         header: "teste",
         body: "oi",
         method: GET,
-        url: "/oi"
+        url: "/oi",
+        date: new Date().toString()
     }
 }
 
 function getAndCheckRequests(requestShelf: IRequestShelf, expected: string) {
-    let request: IRequest[] = requestShelf.getRequests('1')
+    let request: IRequest[] = requestShelf.getRequests('1', "GET/oi")
     expect(JSON.stringify(request)).to.equal(expected)
 }
 

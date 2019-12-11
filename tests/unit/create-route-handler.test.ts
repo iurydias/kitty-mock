@@ -65,7 +65,7 @@ describe('Create route handler', () => {
         const handler = new CreateRouteHandler(routeShelf)
         let server: Server = createServer((req, res) => {
             handler.handle(req).then((response) => {
-                checkResponse(response, 'fail', 'request missing body. Unexpected end of JSON input', 500)
+                checkResponse(response, 'error', 'request missing body. Unexpected end of JSON input', 500)
                 success++
             }).catch(() => {
                 failed++
