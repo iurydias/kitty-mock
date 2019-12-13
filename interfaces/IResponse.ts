@@ -1,4 +1,4 @@
 export default interface IResponse {
-    code: number
-    body: string
+  code: number
+  body: string
 }
