@@ -17,7 +17,7 @@ describe('Getter routes handler', () => {
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
       new RoutesGetterHandler(routeShelf).handle(req).then((response) => {
-        checkResponse(response, 'success', `[{"path":"/oi","method":"GET"}]`, undefined, 204)
+        checkResponse(response, 'success', `[{"path":"/oi","method":"GET"}]`, undefined, 200)
         success++
       })
       res.statusCode = 200
@@ -35,7 +35,7 @@ describe('Getter routes handler', () => {
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
       new RoutesGetterHandler(routeShelf).handle(req).then((response) => {
-        checkResponse(response, 'success', `[]`, undefined, 500)
+        checkResponse(response, 'success', `[]`, undefined, 200)
         success++
       })
       res.statusCode = 200
