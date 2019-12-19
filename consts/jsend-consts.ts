@@ -1,3 +1,3 @@
-export const StatusSuccess = 'success'
-export const StatusError = 'error'
-export const StatusFail = 'fail'
+export const StatusSuccess: string = 'success'
+export const StatusError: string = 'error'
+export const StatusFail: string = 'fail'

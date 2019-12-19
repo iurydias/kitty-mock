@@ -1,16 +1,13 @@
 import IRouteShelf from '../interfaces/IRouteShelf'
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
+import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
 import IRoute from '../interfaces/IRoute'
 import getJsend from '../helpers/get-jsend'
 import IResponse from '../interfaces/IResponse'
 import IMocker from '../interfaces/IMocker'
-import { performance } from 'perf_hooks'
-import { KITTY } from '../consts/kitty'
+import {performance} from 'perf_hooks'
+import {KITTY} from '../consts/kitty'
 import IHandler from '../interfaces/IHandler'
-import IRequestShelf from '../interfaces/IRequestShelf'
-import IRequest from '../interfaces/IRequest'
-import getRequestBody from '../helpers/get-request-body'
-import ErrnoException = NodeJS.ErrnoException
+import ErrnoException = NodeJS.ErrnoException;
 
 const chalk = require('chalk')
 
@@ -32,13 +29,13 @@ export default class Mocker implements IMocker {
     this.server = createServer((req, res) => {
       let initialTime: number = performance.now()
       let path: string = req.url.split('?', 1)[0]
-      this.routeShelf.getItem(this.port.toString(), path, req.method).then(route => {
+      this.routeShelf.getItem(this.port, path, req.method).then(route => {
         if (typeof route.response != 'function') {
           let response: IResponse = route.response as IResponse
           this.respRequest(res, response, req, initialTime)
         } else {
           let handle: IHandler = route.response as IHandler
-          handle(req).then((resp: IResponse) => {
+         return handle(req).then((resp: IResponse) => {
             this.respRequest(res, resp, req, initialTime)
           })
         }
@@ -55,53 +52,53 @@ export default class Mocker implements IMocker {
     })
   }
 
-  private respRequest (res: ServerResponse, resp: IResponse, req: IncomingMessage, initialTime: number): void {
-    res.writeHead(resp.code, { 'Content-Type': 'application/json' })
-    res.end(resp.body, () => {
-      this.printLog(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''), resp.code, req.method, req.url, this.getExecutionTime(performance.now(), initialTime))
-    })
-  }
-
-  public runServer (): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this.server.listen(Number(this.port), this.hostname, () => {
-        resolve(`New mocker running at http://${this.hostname}:${this.port}/`)
-      })
-      this.server.on('error', (e: ErrnoException) => {
-        if (e.code === 'EADDRINUSE') {
-          reject('Address in use, retrying...')
-        }
-      })
-    })
-  }
-
-  public addRoute (route: IRoute): void {
-    console.log('New route added to mocker on port ' + this.port + ' | ' + ' '.repeat(7 - route.filters.method.length) + route.filters.method + ' ' + route.filters.path)
-    this.routeShelf.setItem(this.port.toString(), route)
-
-  }
-
-  public stopServer (): Promise<null> {
-    console.log('Closing mocker on port ' + this.port)
-    return new Promise((resolve, reject) => {
-      this.server.close((error) => error ? reject(error) : resolve(null))
-    })
-  }
-
-  public printLog (date: string, code: number, method: string, path: string, time: string): void {
-    let repeatSpaceOnTimeExecution: number = 20 - time.length
-    let repeatSpaceOnMethod: number = 7 - method.length
-    switch (true) {
-      case (code >= 500):
-        console.log(`${KITTY} ${date} | ${chalk.bgRed.bold(`  ${code}  `)} | ${' '.repeat(repeatSpaceOnTimeExecution)}${time} ms | ${' '.repeat(repeatSpaceOnMethod)}${method}  ${path}`)
-        return
-      case (code >= 400 && code < 500):
-        console.log(`${KITTY} ${date} | ${chalk.black.bgYellow.bold(`  ${code}  `)} | ${' '.repeat(repeatSpaceOnTimeExecution)}${time} ms | ${' '.repeat(repeatSpaceOnMethod)}${method}  ${path}`)
-        return
-      default:
-        console.log(`${KITTY} ${date} | ${chalk.bgGreen.bold(`  ${code}  `)} | ${' '.repeat(repeatSpaceOnTimeExecution)}${time} ms | ${' '.repeat(repeatSpaceOnMethod)}${method}  ${path}`)
+    private respRequest(res: ServerResponse, resp: IResponse, req: IncomingMessage, initialTime: number): void {
+        res.writeHead(resp.code, {'Content-Type': 'application/json'})
+        res.end(resp.body, () => {
+            this.printLog(new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''), resp.code, req.method, req.url, this.getExecutionTime(performance.now(), initialTime))
+        })
     }
-  }
+
+    public runServer(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.server.listen(Number(this.port), this.hostname, () => {
+                resolve(`New mocker running at http://${this.hostname}:${this.port}/`)
+            })
+            this.server.on('error', (e: ErrnoException) => {
+                if (e.code === 'EADDRINUSE') {
+                    reject(`Address ${this.hostname}:${this.port} already in use...`)
+                }
+            })
+        })
+    }
+
+    public addRoute(route: IRoute): void {
+        console.log('New route added to mocker on port ' + this.port + ' | ' + ' '.repeat(7 - route.filters.method.length) + route.filters.method + ' ' + route.filters.path)
+        this.routeShelf.setItem(this.port, route)
+
+    }
+
+    public stopServer(): Promise<null> {
+        console.log('Closing mocker on port ' + this.port)
+        return new Promise((resolve, reject) => {
+            this.server.close((error) => error ? reject(error) : resolve(null))
+        })
+    }
+
+    public printLog(date: string, code: number, method: string, path: string, time: string): void {
+        let repeatSpaceOnTimeExecution: number = 20 - time.length
+        let repeatSpaceOnMethod: number = 7 - method.length
+        switch (true) {
+            case (code >= 500):
+                console.log(`${KITTY} ${date} | ${chalk.bgRed.bold(`  ${code}  `)} | ${' '.repeat(repeatSpaceOnTimeExecution)}${time} ms | ${' '.repeat(repeatSpaceOnMethod)}${method}  ${path}`)
+                return
+            case (code >= 400 && code < 500):
+                console.log(`${KITTY} ${date} | ${chalk.black.bgYellow.bold(`  ${code}  `)} | ${' '.repeat(repeatSpaceOnTimeExecution)}${time} ms | ${' '.repeat(repeatSpaceOnMethod)}${method}  ${path}`)
+                return
+            default:
+                console.log(`${KITTY} ${date} | ${chalk.bgGreen.bold(`  ${code}  `)} | ${' '.repeat(repeatSpaceOnTimeExecution)}${time} ms | ${' '.repeat(repeatSpaceOnMethod)}${method}  ${path}`)
+        }
+    }
 
   private getExecutionTime (t1: number, t0: number): string {
     return (t1 - t0).toString()

@@ -1,9 +1,9 @@
 import getJsend from '../helpers/get-jsend'
-import { IncomingMessage } from 'http'
+import {IncomingMessage} from 'http'
 import Mocker from '../mocker/mocker'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import RouteShelf from '../routeShelf/route-shelf'
-import { DELETE, GET, POST } from '../consts/methods-consts'
+import {DELETE, GET, POST} from '../consts/methods-consts'
 import CreateRouteHandler from './create-route-handler'
 import DeleteRouteHandler from './delete-route-handler'
 import RoutesGetterHandler from './routes-getter-handler'
@@ -14,6 +14,7 @@ import IRequestShelf from '../interfaces/IRequestShelf'
 import HistoryGetterHandler from './history-getter-handler'
 import DeleteHistoryHandler from './delete-history-handler'
 import getPort from '../helpers/get_port'
+import { RESERVED_PATH } from '../consts/kitty'
 
 export default class CreateMockerHandler {
   readonly hostname: string
@@ -42,23 +43,23 @@ export default class CreateMockerHandler {
       mocker.loadServer()
       mocker.runServer().then(() => {
         mocker.addRoute({
-          filters: { path: '/=%5E.%5E=/route', method: GET },
+          filters: { path: `/${RESERVED_PATH}/route`, method: GET },
           response: RoutesGetterHandler.prototype.handle.bind(new RoutesGetterHandler(this.routeShelf))
         })
         mocker.addRoute({
-          filters: { path: '/=%5E.%5E=/route', method: POST },
+          filters: { path: `/${RESERVED_PATH}/route`, method: POST },
           response: CreateRouteHandler.prototype.handle.bind(new CreateRouteHandler(this.routeShelf))
         })
         mocker.addRoute({
-          filters: { path: '/=%5E.%5E=/route', method: DELETE },
+          filters: { path: `/${RESERVED_PATH}/route`, method: DELETE },
           response: DeleteRouteHandler.prototype.handle.bind(new DeleteRouteHandler(this.routeShelf))
         })
         mocker.addRoute({
-          filters: { path: '/=%5E.%5E=/history', method: GET },
+          filters: { path: `/${RESERVED_PATH}/history`, method: GET },
           response: HistoryGetterHandler.prototype.handle.bind(new HistoryGetterHandler(this.requestShelf))
         })
         mocker.addRoute({
-          filters: { path: '/=%5E.%5E=/history', method: DELETE },
+          filters: { path: `/${RESERVED_PATH}/history`, method: DELETE },
           response: DeleteHistoryHandler.prototype.handle.bind(new DeleteHistoryHandler(this.requestShelf))
         })
         mocker.addRoute({

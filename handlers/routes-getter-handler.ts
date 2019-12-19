@@ -1,9 +1,10 @@
 import getJsend from '../helpers/get-jsend'
 import IResponse from '../interfaces/IResponse'
-import { IncomingMessage } from 'http'
+import {IncomingMessage} from 'http'
 import IRoute from '../interfaces/IRoute'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import IFilter from '../interfaces/IFilter'
+import { RESERVED_PATH } from '../consts/kitty'
 
 export default class RoutesGetterHandler {
   private mockerRouteShelf: IRouteShelf
@@ -25,7 +26,7 @@ export default class RoutesGetterHandler {
 
 function hydrate (routes: IRoute[]): IFilter[] {
   let filteredRoutes: IRoute[] = routes.filter((route) => {
-    return route.filters.path != '/=%5E.%5E=/route' && route.filters.path != '/=%5E.%5E=/history'
+    return route.filters.path != `/${RESERVED_PATH}/route` && route.filters.path != `/${RESERVED_PATH}/history`
   })
   return filteredRoutes.map((route) => {
     return route.filters

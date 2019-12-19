@@ -1,4 +1,3 @@
-import { expect } from 'chai'
 import 'mocha'
 import IResponse from '../../interfaces/IResponse'
 import CreateMockerHandler from '../../handlers/create-mocker-handler'
@@ -34,29 +33,15 @@ describe('Testing create mocker handler', () => {
   })
 })
 
-async function deleteMocker (port: string) {
-  let success: number = 0
-  let failed: number = 0
-  await axios.delete('http://localhost:' + port + '/').then((response) => {
+ function deleteMocker (port: string) {
+  return axios.delete('http://localhost:' + port + '/').then((response) => {
     expect(response.status).to.equal(204)
-    success++
-  }).catch(() => {
-    failed++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
 }
 
-async function checkMockerStatus (port: string) {
-  let success: number = 0
-  let failed: number = 0
-  await axios.get('http://localhost:' + port + '/').then((response) => {
-    expect(response.status).to.equal(204)
-    expect(response.data).to.equal('')
-    success++
-  }).catch(() => {
-    failed++
-  })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
+function checkMockerStatus(port: string) {
+  return axios.get('http://localhost:' + port + '/').then((response) => {
+        expect(response.status).to.equal(204)
+        expect(response.data).to.equal('')
+    })
 }

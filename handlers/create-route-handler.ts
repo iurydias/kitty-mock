@@ -1,17 +1,17 @@
 import getJsend from '../helpers/get-jsend'
 import getRequestBody from '../helpers/get-request-body'
-import { IncomingMessage } from 'http'
+import {IncomingMessage} from 'http'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import checkRequest from '../helpers/check-request'
 import IRoute from '../interfaces/IRoute'
 import IResponse from '../interfaces/IResponse'
 
 export default class CreateRouteHandler {
-  private mockerRoutesList: IRouteShelf
+    private mockerRoutesList: IRouteShelf
 
-  constructor (mockerRoutesList: IRouteShelf) {
-    this.mockerRoutesList = mockerRoutesList
-  }
+    constructor(mockerRoutesList: IRouteShelf) {
+        this.mockerRoutesList = mockerRoutesList
+    }
 
   public handle (req: IncomingMessage): Promise<IResponse> {
     return getRequestBody(req).then((body) => {

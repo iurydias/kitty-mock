@@ -10,140 +10,123 @@ import IRequest from '../../interfaces/IRequest'
 
 describe('Server teste 1', () => {
   let server: IMocker
-  before(async () => {
-    server = await runServer('127.0.0.1', '4000', '5000-6000')
-  })
-  after(async () => {
-    await server.stopServer()
-  })
+  before(async () => server = await runServer('127.0.0.1', '4000', '5000-6000'))
+  after(() => server.stopServer())
 
-  it('Check mocker root functionality', async () => {
-    let success: number = 0
-    let failed: number = 0
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await checkMockerStatus(port).then(async () => {
-        await deleteMocker(port).then(async () => {
-          await checkDeletedMocker(port).then(() => {
-            success++
-          })
-        })
-      })
-    }).catch(() => {
-      failed++
-    })
-    expect(failed).to.equal(0)
-    expect(success).to.equal(1)
+  it('Check mocker root functionality', () => {
+    createANewMocker('4000', [5000, 6000]).then((port) =>
+      checkMockerStatus(port).then(() =>
+        deleteMocker(port).then(() =>
+          checkDeletedMocker(port)
+        )
+      )
+    )
   })
-  it('Create two mockers in a range with one port', async () => {
-    let success: number = 0
-    let failed: number = 0
-    await runServer('127.0.0.1', '4001', '6000-6001').then(async function (serverMockerRoot) {
-      await createANewMocker('4001', [6000, 6001]).then(async (mockerPort) => {
-        await createANewMockerWithFail().then(async () => {
+  it('Create two mockers in a range with one port', () => {
+    runServer('127.0.0.1', '4001', '6000-6001').then((serverMockerRoot) =>
+      createANewMocker('4001', [6000, 6001]).then((mockerPort) =>
+        createANewMockerWithFail().then(async () => {
           await deleteMocker(mockerPort)
-          await serverMockerRoot.stopServer().then(() => {
-            success++
-          })
+          await serverMockerRoot.stopServer()
         })
-      })
-    }).catch(() => {
-      failed++
-    })
-    expect(failed).to.equal(0)
-    expect(success).to.equal(1)
+      )
+    )
   })
   it('Request to mocker server root with unacceptable methods', () => {
-    makeRequestToServerRoot('put')
-    makeRequestToServerRoot('delete')
-    makeRequestToServerRoot('get')
-    makeRequestToServerRoot('patch')
+    requestToServerRootShouldFail('put')
+    requestToServerRootShouldFail('delete')
+    requestToServerRootShouldFail('get')
+    requestToServerRootShouldFail('patch')
   })
-  it('Request to mocker server with unacceptable methods', async () => {
-    let port: string = await createANewMocker('4000', [5000, 6000])
-    makeRequestToServer('put', port)
-    makeRequestToServer('post', port)
-    makeRequestToServer('patch', port)
-    deleteMocker(port)
+  it('Request to mocker server with unacceptable methods', () => {
+    createANewMocker('4000', [5000, 6000])
+      .then((port) => Promise.all([
+        makeRequestToServer('put', port),
+        makeRequestToServer('post', port),
+        makeRequestToServer('patch', port)
+      ]).then(() => deleteMocker(port)))
   })
-  it('Check server mocker functionality', async () => {
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      let route: IRoute = { filters: { path: '/oi', method: 'POST' }, response: { code: 200, body: 'sddfsdf' } }
-      await createANewRoute(port, 'success', 'route successfully created', 1, 0, route).then(async () => {
-        await requestToARoute('POST', {
+  it('Check server mocker functionality', () =>
+    createANewMocker('4000', [5000, 6000]).then((port) => {
+      let route: IRoute = {
+        filters: { path: '/oi', method: 'POST' },
+        response: { code: 200, body: 'sddfsdf' }
+      }
+      return createANewRoute(port, 'success', 'route successfully created', route).then(() =>
+        requestToARoute('POST', {
           port: port,
           path: '/oi',
           expectedCode: 200,
           expectedResponse: '"sddfsdf"'
-        }).then(async () => {
-          await deleteARoute(port, { path: '/oi', method: 'POST' }).then(async () => {
-            await requestToADeletedRoute('POST', {
+        }).then(() =>
+          deleteARoute(port, { path: '/oi', method: 'POST' }).then(() =>
+            requestToADeletedRoute('POST', {
               port: port,
               path: '/oi',
               expectedCode: 404
-            }).then(async () => {
-              await deleteMocker(port)
-            })
-          })
-        })
-      })
+            }).then(() => deleteMocker(port))
+          )
+        )
+      )
     })
-  })
-  it('Check server mocker routes ', async () => {
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      let route: IRoute = { filters: { path: '/oi', method: 'POST' }, response: { code: 200, body: 'sddfsdf' } }
-      await createANewRoute(port, 'success', 'route successfully created', 1, 0, route).then(async () => {
-        await requestToARoute('GET', {
+  )
+  it('Check server mocker routes ', () =>
+    createANewMocker('4000', [5000, 6000]).then((port) => {
+      let route: IRoute = {
+        filters: { path: '/oi', method: 'POST' },
+        response: { code: 200, body: 'sddfsdf' }
+      }
+      return createANewRoute(port, 'success', 'route successfully created', route).then(() =>
+        requestToARoute('GET', {
           port: port,
           path: '/=^.^=/route',
           expectedCode: 200,
           expectedResponse: '{"status":"success","data":"[{\\"path\\":\\"/\\",\\"method\\":\\"GET\\"},{\\"path\\":\\"/\\",\\"method\\":\\"DELETE\\"},{\\"path\\":\\"/oi\\",\\"method\\":\\"POST\\"}]"}'
-        }).finally(async () => {
-          await deleteMocker(port)
-        })
-      })
+        }).finally(() => deleteMocker(port))
+      )
     })
-  })
-  it('Check server mocker creating repeated routes', async () => {
+  )
+  it('Check server mocker creating repeated routes', () => {
     let route: IRoute = { filters: { path: '/oi', method: 'POST' }, response: { code: 200, body: 'sddfsdf' } }
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await createANewRoute(port, 'success', 'route successfully created', 1, 0, route).then(async () => {
-        await createANewRoute(port, 'fail', 'route already created in this mocker', 0, 1, route).finally(async () => {
-          await deleteMocker(port)
-        })
-      })
-    })
+    return createANewMocker('4000', [5000, 6000]).then((port) =>
+      createANewRoute(port, 'success', 'route successfully created', route).then(() =>
+        createANewRoute(port, 'fail', 'route already created in this mocker', route).finally(() =>
+          deleteMocker(port)
+        )
+      )
+    )
   })
-  it('Check server mocker creating route with invalid path', async () => {
+  it('Check server mocker creating route with invalid path', () => {
     let route: IRoute = { filters: { path: 'oi', method: 'POST' }, response: { code: 200, body: 'sddfsdf' } }
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await createANewRoute(port, 'fail', 'request with invalid route path', 0, 1, route).then(async () => {
-        await deleteMocker(port)
-      })
-    })
+    return createANewMocker('4000', [5000, 6000]).then((port) =>
+      createANewRoute(port, 'fail', 'request with invalid route path', route).then(() =>
+        deleteMocker(port)
+      )
+    )
   })
-  it('Check server mocker creating route with invalid method', async () => {
+  it('Check server mocker creating route with invalid method', () => {
     let route: IRoute = { filters: { path: '/oi', method: 'POsST' }, response: { code: 200, body: 'sddfsdf' } }
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await createANewRoute(port, 'fail', 'request with invalid route method', 0, 1, route).then(async () => {
-        await deleteMocker(port)
-      })
-    })
+    return createANewMocker('4000', [5000, 6000]).then((port) =>
+      createANewRoute(port, 'fail', 'request with invalid route method', route).then(() =>
+        deleteMocker(port)
+      )
+    )
   })
-  it('Check server mocker creating route with invalid code', async () => {
+  it('Check server mocker creating route with invalid code', () => {
     let route: IRoute = { filters: { path: '/oi', method: 'POST' }, response: { code: 700, body: 'sddfsdf' } }
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await createANewRoute(port, 'fail', 'request with invalid route response code', 0, 1, route).then(async () => {
-        await deleteMocker(port)
-      })
-    })
+    return createANewMocker('4000', [5000, 6000]).then((port) =>
+      createANewRoute(port, 'fail', 'request with invalid route response code', route).then(() =>
+        deleteMocker(port)
+      )
+    )
   })
-  it('Check server mocker creating route with invalid json', async () => {
+  it('Check server mocker creating route with invalid json', () => {
     let route: IRoute = { filters: { path: '/oi', method: 'POST' }, response: { code: 700, body: 'sddfsdf' } }
-    await createANewMocker('4000', [5000, 6000]).then(async (port) => {
-      await tryCreateARouteWithInvalidJson(port, 'error', 'request missing body. Unexpected end of JSON input', 0, 1, route).then(async () => {
-        await deleteMocker(port)
-      })
-    })
+    return createANewMocker('4000', [5000, 6000]).then(async (port) =>
+      tryCreateARouteWithInvalidJson(port, 'error', 'request missing body. Unexpected end of JSON input').then(() =>
+        deleteMocker(port)
+      )
+    )
   })
   it('Checking route history functionality', async () => {
     await createANewMocker('4000', [5000, 6000]).then(async (port) => {
@@ -168,76 +151,48 @@ describe('Server teste 1', () => {
   })
 })
 
-async function runServer (host: string, port: string, portsRange: string): Promise<IMocker> {
+function runServer (host: string, port: string, portsRange: string): Promise<IMocker> {
   return server({ host: host, serverPort: port, mockersPortsRange: portsRange })
 }
 
-async function makeRequestToServerRoot (method: Method) {
-  let success: number = 0
-  let failed: number = 0
-  await axios({
+function requestToServerRootShouldFail (method: Method) {
+  return axios({
     method: method,
     url: 'http://localhost:4000/create'
-  }).then(() => {
-    success++
   }).catch((error) => {
     expect(error.response.status).to.equal(405)
-    failed++
   })
-  expect(failed).to.equal(1)
-  expect(success).to.equal(0)
 }
 
-async function makeRequestToServer (method: Method, port: string) {
-  let success: number = 0
-  let failed: number = 0
-  await axios({
+function makeRequestToServer (method: Method, port: string) {
+  return axios({
     method: method,
     url: 'http://localhost:' + port + '/'
-  }).then(() => {
-    success++
   }).catch((error) => {
     expect(error.response.status).to.equal(405)
-    failed++
   })
-  expect(failed).to.equal(1)
-  expect(success).to.equal(0)
 }
 
 async function createANewMocker (port: string, range: Array<number>): Promise<string> {
   let body: string = ''
-  let success: number = 0
-  let failed: number = 0
   await axios.post(`http://localhost:${port}/create`).then((response) => {
     expect(response.status).to.equal(200)
     body = JSON.stringify(response.data)
-    success++
-  }).catch(() => {
-    failed++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
   let res: IJsend = JSON.parse(body)
   expect(res.status).to.equal('success')
   let mockerInfo = JSON.parse(res.data)
-  expect(mockerInfo.port >= range[0] && mockerInfo.port <= range[1]).to.be.true
+  expect(inRange(mockerInfo.port, range[0], range[1])).to.equal(true)
   expect(res.message).to.equal('mocker successfully created')
   return mockerInfo.port.toString()
 }
 
-async function deleteARoute (port: string, { path, method }) {
-  let success: number = 0
-  let failed: number = 0
-  await axios.delete(`http://localhost:${port}/=^.^=/route?path=${path}&method=${method}`).then((response) => {
+function deleteARoute (port: string, { path, method }) {
+  return axios.delete(`http://localhost:${port}/=^.^=/route?path=${path}&method=${method}`).then((response) => {
     expect(response.status).to.equal(204)
-    success++
-  }).catch(() => {
-    failed++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
-}
 
+}
 async function getAndCheckRouteHistory (port: string, { path, method }) {
   let body: string = ''
   let success: number = 0
@@ -261,7 +216,6 @@ async function getAndCheckRouteHistory (port: string, { path, method }) {
   expect(history[0].method).to.equal(POST)
   expect(history[0].date).to.be.not.undefined
 }
-
 async function getAndCheckEmptyRouteHistory (port: string, { path, method }) {
   let success: number = 0
   let failed: number = 0
@@ -289,41 +243,28 @@ async function deleteRouteHistory (port: string, { path, method }) {
   expect(failed).to.equal(0)
   expect(success).to.equal(1)
 }
-
-async function createANewRoute (port: string, status: string, message: string, success: number, fail: number, route: IRoute) {
+async function createANewRoute (port: string, status: string, message: string, route: IRoute) {
   let body: string = ''
-  let successVar: number = 0
-  let failedVar: number = 0
   await axios.post('http://localhost:' + port + '/=^.^=/route', JSON.stringify(route)).then((response) => {
     expect(response.status).to.equal(200)
     body = JSON.stringify(response.data)
-    successVar++
   }).catch((error) => {
     body = JSON.stringify(error.response.data)
-    failedVar++
   })
-  expect(failedVar).to.equal(fail)
-  expect(successVar).to.equal(success)
   let res: IJsend = JSON.parse(body)
   expect(res.status).to.equal(status)
   expect(res.data).to.be.undefined
   expect(res.message).to.equal(message)
 }
 
-async function tryCreateARouteWithInvalidJson (port: string, status: string, message: string, success: number, fail: number, route: IRoute) {
+async function tryCreateARouteWithInvalidJson (port: string, status: string, message: string) {
   let body: string = ''
-  let successVar: number = 0
-  let failedVar: number = 0
   await axios.post('http://localhost:' + port + '/=^.^=/route', `{"sdfsdf":100`).then((response) => {
     expect(response.status).to.equal(200)
     body = JSON.stringify(response.data)
-    successVar++
   }).catch((error) => {
     body = JSON.stringify(error.response.data)
-    failedVar++
   })
-  expect(failedVar).to.equal(fail)
-  expect(successVar).to.equal(success)
   let res: IJsend = JSON.parse(body)
   expect(res.status).to.equal(status)
   expect(res.data).to.be.undefined
@@ -332,88 +273,49 @@ async function tryCreateARouteWithInvalidJson (port: string, status: string, mes
 
 async function requestToARoute (method: Method, { port, path, expectedCode, expectedResponse }) {
   let body: string = ''
-  let success: number = 0
-  let failed: number = 0
   await axios({
     method: method,
     url: 'http://localhost:' + port + path
   }).then((response) => {
     expect(response.status).to.equal(expectedCode)
     body = JSON.stringify(response.data)
-    success++
-  }).catch(() => {
-    failed++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
   expect(body).to.equal(expectedResponse)
 }
 
-async function requestToADeletedRoute (method: Method, { port, path, expectedCode }) {
-  let success: number = 0
-  let failed: number = 0
-  await axios({
+function requestToADeletedRoute (method: Method, { port, path, expectedCode }) {
+  return axios({
     method: method,
     url: 'http://localhost:' + port + path
-  }).then(() => {
-    success++
   }).catch((error) => {
     expect(error.response.status).to.equal(expectedCode)
-    failed++
   })
-  expect(success).to.equal(0)
-  expect(failed).to.equal(1)
 }
 
-async function createANewMockerWithFail () {
-  let success: number = 0
-  let failed: number = 0
-  await axios.post('http://localhost:4001/create').then((response) => {
-    success++
-  }).catch((error) => {
+function createANewMockerWithFail () {
+  return axios.post('http://localhost:4001/create').catch((error) => {
     expect(error.response.status).to.equal(500)
-    failed++
   })
-  expect(failed).to.equal(1)
-  expect(success).to.equal(0)
 }
 
-async function checkMockerStatus (port: string) {
-  let success: number = 0
-  let failed: number = 0
-  await axios.get('http://localhost:' + port + '/').then((response) => {
+function checkMockerStatus (port: string) {
+  return axios.get('http://localhost:' + port + '/').then((response) => {
     expect(response.status).to.equal(204)
     expect(response.data).to.equal('')
-    success++
-  }).catch(() => {
-    failed++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
 }
 
 async function checkDeletedMocker (port: string) {
-  let success: number = 0
   let failed: number = 0
-  await axios.get('http://localhost:' + port + '/').then((response) => {
-    success++
-  }).catch((error) => {
+  await axios.get('http://localhost:' + port + '/').catch(() => {
     failed++
   })
   expect(failed).to.equal(1)
-  expect(success).to.equal(0)
 }
 
-async function deleteMocker (port: string) {
-  let success: number = 0
-  let failed: number = 0
-  await axios.delete('http://localhost:' + port + '/').then((response) => {
+function deleteMocker (port: string) {
+  return axios.delete('http://localhost:' + port + '/').then((response) => {
     expect(response.status).to.equal(204)
     expect(response.data).to.equal('')
-    success++
-  }).catch((err) => {
-    failed++
   })
-  expect(failed).to.equal(0)
-  expect(success).to.equal(1)
 }
