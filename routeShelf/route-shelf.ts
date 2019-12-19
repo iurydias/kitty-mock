@@ -62,7 +62,7 @@ export default class RouteShelf implements IRouteShelf {
     }
   }
 
-  private getMocker (port: string): IMockerRouter {
+  private getMocker (port: number): IMockerRouter {
     return this.mockerRoutesList.find((mocker) => mocker.mockerPort == port)
   }
 

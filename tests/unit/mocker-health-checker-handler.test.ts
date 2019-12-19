@@ -27,7 +27,7 @@ describe('Health checker handler', () => {
 
 })
 
-async function checkResponse (response: IResponse, status: string, message: string, code: number) {
+function checkResponse (response: IResponse, status: string, message: string, code: number) {
   let jsend: IJsend = JSON.parse(response.body)
   expect(jsend.status).to.equal(status)
   expect(jsend.data).to.equal(undefined)

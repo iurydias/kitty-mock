@@ -11,7 +11,7 @@ import IRequest from '../../interfaces/IRequest'
 
 describe('Create history getter handler', () => {
 
-  it('Getting history with request', (done) => {
+  it('Getting history with request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     requestShelf.setRequest('7003', 'GET/oi', getMockRequest())
     let success: number = 0
@@ -24,13 +24,12 @@ describe('Create history getter handler', () => {
       res.end()
     })
     server.listen(7003)
-    axios.post('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    return axios.post('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
-      done()
+      return server.close()
     })
   })
-  it('Getting history no request', (done) => {
+  it('Getting history no request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
@@ -42,13 +41,12 @@ describe('Create history getter handler', () => {
       res.end()
     })
     server.listen(7004)
-    axios.post('http://127.0.0.1:7004?path=/oi&method=get').finally(() => {
+    return axios.post('http://127.0.0.1:7004?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
-      done()
+      return server.close()
     })
   })
-  it('Getting history with request but not for the required', (done) => {
+  it('Getting history with request but not for the required', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let success: number = 0
     requestShelf.setRequest('7005', 'GET/oi', getMockRequest())
@@ -61,15 +59,14 @@ describe('Create history getter handler', () => {
       res.end()
     })
     server.listen(7005)
-    axios.post('http://127.0.0.1:7005?path=/oii&method=get').finally(() => {
+    return axios.post('http://127.0.0.1:7005?path=/oii&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
-      done()
+      return server.close()
     })
   })
 })
 
-async function checkResponse (response: IResponse, status: string, data: string, message: string, code: number) {
+function checkResponse (response: IResponse, status: string, data: string, message: string, code: number) {
   let jsend: IJsend = JSON.parse(response.body)
   expect(jsend.status).to.equal(status)
   expect(JSON.stringify(jsend.data)).to.equal(data)

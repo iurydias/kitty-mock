@@ -45,9 +45,4 @@ async function checkResponse (response: IResponse, status: string, data: string,
   expect(response.code).to.equal(code)
 }
 
-function getMockRoute (): IRoute {
-  return {
-    filters: { path: '/oi', method: 'GET' },
-    response: { code: 200, body: 'oioi' }
-  }
-}
+

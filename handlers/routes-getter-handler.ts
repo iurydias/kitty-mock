@@ -15,7 +15,7 @@ export default class RoutesGetterHandler {
 
   public handle (req: IncomingMessage): Promise<IResponse> {
     return new Promise((resolve) => {
-      let routes: IRoute[] | undefined = this.mockerRouteShelf.getItems(req.socket.localPort.toString())
+      let routes: IRoute[] | undefined = this.mockerRouteShelf.getItems(req.socket.localPort)
       resolve({
         code: 200,
         body: getJsend({ statusCode: 200, data: JSON.stringify(hydrate(routes)), message: undefined })

@@ -1,4 +1,5 @@
 import 'mocha'
+import {expect} from 'chai'
 import IResponse from '../../interfaces/IResponse'
 import CreateMockerHandler from '../../handlers/create-mocker-handler'
 import axios from 'axios'

@@ -131,8 +131,8 @@ describe('Server teste 1', () => {
   it('Checking route history functionality', async () => {
     await createANewMocker('4000', [5000, 6000]).then(async (port) => {
       let route: IRoute = { filters: { path: '/oi', method: POST }, response: { code: 200, body: 'sddfsdf' } }
-      await createANewRoute(port, 'success', 'route successfully created', 1, 0, route).then(async () => {
-        await requestToARoute(POST, {
+      await createANewRoute(port, 'success', 'route successfully created', route).then(async () => {
+        await requestToARoute('POST', {
           port: port,
           path: '/oi',
           expectedCode: 200,
@@ -182,7 +182,7 @@ async function createANewMocker (port: string, range: Array<number>): Promise<st
   let res: IJsend = JSON.parse(body)
   expect(res.status).to.equal('success')
   let mockerInfo = JSON.parse(res.data)
-  expect(inRange(mockerInfo.port, range[0], range[1])).to.equal(true)
+  expect(mockerInfo.port >= range[0] && range[1] >= mockerInfo.port).to.equal(true)
   expect(res.message).to.equal('mocker successfully created')
   return mockerInfo.port.toString()
 }

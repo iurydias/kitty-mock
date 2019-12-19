@@ -4,12 +4,15 @@ import Mocker from '../../mocker/mocker'
 import axios from 'axios'
 import RouteShelf from '../../routeShelf/route-shelf'
 import IRoute from '../../interfaces/IRoute'
+import IRequestShelf from '../../interfaces/IRequestShelf'
+import RequestShelf from '../../requestShelf/request-shelf'
 
 describe('Mocker', () => {
 
   it('Creating route', async () => {
     let routeShelf = new RouteShelf()
-    const mocker = new Mocker('127.0.0.1', 5008, routeShelf)
+    let requestShelf: IRequestShelf = new RequestShelf()
+    const mocker = new Mocker('127.0.0.1', 5008, routeShelf, requestShelf)
     mocker.loadServer()
     await mocker.runServer()
     mocker.addRoute(getMockRoute())
@@ -23,7 +26,8 @@ describe('Mocker', () => {
   })
   it('Stopping server', async () => {
     let routeShelf = new RouteShelf()
-    const mocker = new Mocker('127.0.0.1', 5009, routeShelf)
+    let requestShelf: IRequestShelf = new RequestShelf()
+    const mocker = new Mocker('127.0.0.1', 5009, routeShelf, requestShelf)
     mocker.loadServer()
     await mocker.runServer()
     mocker.addRoute(getMockRoute())

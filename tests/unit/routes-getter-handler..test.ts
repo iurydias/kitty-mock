@@ -11,9 +11,9 @@ import IRouteShelf from '../../interfaces/IRouteShelf'
 
 describe('Getter routes handler', () => {
 
-  it('Getting routes with existent route', (done) => {
+  it('Getting routes with existent route', () => {
     let routeShelf: IRouteShelf = new RouteShelf()
-    routeShelf.setItem('7003', getMockRoute())
+    routeShelf.setItem(7003, getMockRoute())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
       new RoutesGetterHandler(routeShelf).handle(req).then((response) => {
@@ -24,13 +24,12 @@ describe('Getter routes handler', () => {
       res.end()
     })
     server.listen(7003)
-    axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    return axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
-      done()
+      return server.close()
     })
   })
-  it('Getting routes with no existent route', (done) => {
+  it('Getting routes with no existent route', () => {
     let routeShelf: IRouteShelf = new RouteShelf()
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
@@ -42,15 +41,14 @@ describe('Getter routes handler', () => {
       res.end()
     })
     server.listen(7003)
-    axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    return axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
-      done()
+      return server.close()
     })
   })
 })
 
-async function checkResponse (response: IResponse, status: string, data: string, message: string, code: number) {
+function checkResponse (response: IResponse, status: string, data: string, message: string, code: number) {
   let jsend: IJsend = JSON.parse(response.body)
   expect(jsend.status).to.equal(status)
   expect(jsend.data).to.equal(data)

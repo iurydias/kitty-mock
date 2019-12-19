@@ -11,7 +11,7 @@ import DeleteHistoryHandler from '../../handlers/delete-history-handler'
 
 describe('Create delete history getter handler', () => {
 
-  it('Deleting a history with request', (done) => {
+  it('Deleting a history with request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     requestShelf.setRequest('7003', 'GET/oi', getMockRequest())
     let success: number = 0
@@ -24,14 +24,13 @@ describe('Create delete history getter handler', () => {
       res.end()
     })
     server.listen(7003)
-    axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    return  axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
       expect(JSON.stringify(requestShelf.getRequests('7003', 'GET/oi'))).to.equal('[]')
-      done()
+      return server.close()
     })
   })
-  it('Deleting a history with no request', (done) => {
+  it('Deleting a history with no request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
@@ -43,11 +42,10 @@ describe('Create delete history getter handler', () => {
       res.end()
     })
     server.listen(7003)
-    axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    return axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
-      server.close()
       expect(JSON.stringify(requestShelf.getRequests('7003', 'GET/oi'))).to.equal('[]')
-      done()
+      return server.close()
     })
   })
 })
