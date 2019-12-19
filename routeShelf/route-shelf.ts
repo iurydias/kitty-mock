@@ -63,32 +63,22 @@ export default class RouteShelf implements IRouteShelf {
   }
 
   private getMocker (port: string): IMockerRouter {
-    return this.mockerRoutesList.find((mocker) => {
-      return mocker.mockerPort == port
-    })
+    return this.mockerRoutesList.find((mocker) => mocker.mockerPort == port)
   }
 
   private filterRoutesByPath (routesList: IRoute[], path: string): IRoute[] {
-    return routesList.filter((route) => {
-      return route.filters.path == path
-    })
+    return routesList.filter((route) => route.filters.path == path)
   }
 
   private filterPathAndMethodDifferentsRoutes (routesList: IRoute[], { path, method }): IRoute[] {
-    return routesList.filter((route) => {
-      return route.filters.path != path && route.filters.method != method
-    })
+    return routesList.filter((route) => route.filters.path != path && route.filters.method != method)
   }
 
   private getRouteByPathAndMethod (routesList: IRoute[], { path, method }): IRoute {
-    return routesList.find((routeItem) => {
-      return routeItem.filters.path == path && routeItem.filters.method == method
-    })
+    return routesList.find((routeItem) => routeItem.filters.path == path && routeItem.filters.method == method)
   }
 
   private getRouteByMethod (routesList: IRoute[], method): IRoute {
-    return routesList.find((routeItem) => {
-      return routeItem.filters.method == method
-    })
+    return routesList.find((routeItem) => routeItem.filters.method == method)
   }
 }

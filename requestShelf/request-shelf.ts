@@ -45,21 +45,15 @@ export default class RequestShelf implements IRequestShelf {
   }
 
   private getMocker (port: string): IMockerHistory {
-    return this.mockerRequestList.find((mocker) => {
-      return mocker.mockerPort == port
-    })
+    return this.mockerRequestList.find((mocker) => mocker.mockerPort == port)
   }
 
   private filterRouteInfoDeletingById (routeInfoList: IRouteHistoryInfo[], routeId: string): IRouteHistoryInfo[] {
-    return routeInfoList.filter((routeInfo) => {
-      return routeInfo.routeId != routeId
-    })
+    return routeInfoList.filter((routeInfo) => routeInfo.routeId != routeId)
   }
 
   private findRouteInfoById (routeInfoList: IRouteHistoryInfo[], routeId: string): IRouteHistoryInfo {
-    return routeInfoList.find((routeInfo) => {
-      return routeInfo.routeId == routeId
-    })
+    return routeInfoList.find((routeInfo) => routeInfo.routeId == routeId)
   }
 }
 
