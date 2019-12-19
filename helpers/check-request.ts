@@ -1,4 +1,4 @@
-import {CONNECT, DELETE, GET, HEAD, OPTION, PATCH, POST, PUT, TRACE} from '../consts/methods-consts'
+import * as methods from '../consts/methods-consts'
 import IResponse from '../interfaces/IResponse'
 import IFilter from '../interfaces/IFilter'
 
@@ -25,12 +25,11 @@ export default function checkRequest(filters: IFilter, response: IResponse): str
 }
 
 function checkMethod(method: string): boolean {
-    return method == POST || method == GET || method == DELETE || method == HEAD || method == PUT || method == CONNECT ||
-        method == OPTION || method == TRACE || method == PATCH
+    return Object.values(methods).indexOf(method) >= 0
 }
 
 function checkPath(path: string): boolean {
-    let re = /^\/[\w\d\/]*/
+    let re = /^\/[-_\w\d\/]*/
     return re.test(path)
 }
 

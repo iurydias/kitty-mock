@@ -21,7 +21,7 @@ export default class CreateRouteHandler {
             if (err) {
                 return {code: 403, body: getJsend({statusCode: 403, data: undefined, message: err})}
             }
-            let ok: boolean = this.mockerRoutesList.setItem(req.socket.localPort.toString(), route)
+            let ok: boolean = this.mockerRoutesList.setItem(req.socket.localPort, route)
             if (ok) {
                 return {
                     code: 200,

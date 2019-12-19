@@ -27,13 +27,13 @@ export default class Mocker implements IMocker {
         this.server = createServer((req, res) => {
             let initialTime: number = performance.now()
             let path: string = req.url.split('?', 1)[0]
-            this.routeShelf.getItem(this.port.toString(), path, req.method).then(route => {
+            this.routeShelf.getItem(this.port, path, req.method).then(route => {
                 if (typeof route.response != 'function') {
                     let response: IResponse = route.response as IResponse
                     this.respRequest(res, response, req, initialTime)
                 } else {
                     let handle: IHandler = route.response as IHandler
-                    handle(req).then((resp: IResponse) => {
+                    return handle(req).then((resp: IResponse) => {
                         this.respRequest(res, resp, req, initialTime)
                     })
                 }
@@ -61,7 +61,7 @@ export default class Mocker implements IMocker {
             })
             this.server.on('error', (e: ErrnoException) => {
                 if (e.code === 'EADDRINUSE') {
-                    reject('Address in use, retrying...')
+                    reject(`Address ${this.hostname}:${this.port} already in use...`)
                 }
             })
         })
@@ -69,7 +69,7 @@ export default class Mocker implements IMocker {
 
     public addRoute(route: IRoute): void {
         console.log('New route added to mocker on port ' + this.port + ' | ' + ' '.repeat(7 - route.filters.method.length) + route.filters.method + ' ' + route.filters.path)
-        this.routeShelf.setItem(this.port.toString(), route)
+        this.routeShelf.setItem(this.port, route)
 
     }
 

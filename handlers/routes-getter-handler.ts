@@ -4,6 +4,7 @@ import {IncomingMessage} from 'http'
 import IRoute from '../interfaces/IRoute'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import IFilter from '../interfaces/IFilter'
+import { RESERVED_PATH } from '../consts/kitty'
 
 export default class RoutesGetterHandler {
     private mockerRoutesList: IRouteShelf
@@ -14,7 +15,7 @@ export default class RoutesGetterHandler {
 
     public handle(req: IncomingMessage): Promise<IResponse> {
         return new Promise((resolve) => {
-            let routes: IRoute[] | undefined = this.mockerRoutesList.getItems(req.socket.localPort.toString())
+            let routes: IRoute[] | undefined = this.mockerRoutesList.getItems(req.socket.localPort)
             resolve({
                 code: 200,
                 body: getJsend({statusCode: 200, data: JSON.stringify(hydrate(routes)), message: undefined})
@@ -25,7 +26,7 @@ export default class RoutesGetterHandler {
 
 function hydrate(routes: IRoute[]): IFilter[] {
     let filteredRoutes: IRoute[] = routes.filter((route) => {
-        return route.filters.path != "/=%5E.%5E=/route"
+        return route.filters.path != `/${RESERVED_PATH}/route`
     })
     return filteredRoutes.map((route) => {
         return route.filters

@@ -10,6 +10,7 @@ import RoutesGetterHandler from './routes-getter-handler'
 import MockerHealthCheckerHandler from './mocker-health-checker-handler'
 import StopMockerHandler from './stop-mocker-handler'
 import IResponse from '../interfaces/IResponse'
+import { RESERVED_PATH } from '../consts/kitty'
 
 export default class CreateMockerHandler {
     readonly hostname: string
@@ -36,15 +37,15 @@ export default class CreateMockerHandler {
             mocker.loadServer()
             mocker.runServer().then(() => {
                 mocker.addRoute({
-                    filters: {path: '/=%5E.%5E=/route', method: GET},
+                    filters: {path: `/${RESERVED_PATH}/route`, method: GET},
                     response: RoutesGetterHandler.prototype.handle.bind(new RoutesGetterHandler(this.routeShelf))
                 })
                 mocker.addRoute({
-                    filters: {path: '/=%5E.%5E=/route', method: POST},
+                    filters: {path: `/${RESERVED_PATH}/route`, method: POST},
                     response: CreateRouteHandler.prototype.handle.bind(new CreateRouteHandler(this.routeShelf))
                 })
                 mocker.addRoute({
-                    filters: {path: '/=%5E.%5E=/route', method: DELETE},
+                    filters: {path: `/${RESERVED_PATH}/route`, method: DELETE},
                     response: DeleteRouteHandler.prototype.handle.bind(new DeleteRouteHandler(this.routeShelf))
                 })
                 mocker.addRoute({

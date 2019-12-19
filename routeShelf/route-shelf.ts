@@ -5,7 +5,7 @@ import IRouteShelf from '../interfaces/IRouteShelf'
 export default class RouteShelf implements IRouteShelf {
     private mockerRoutesList: IMockerRouter[] = []
 
-    public getItem(mockerPort: string, path: string, method: string): Promise<IRoute> {
+    public getItem(mockerPort: number, path: string, method: string): Promise<IRoute> {
         return new Promise((resolve, reject) => {
             let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
                 return mocker.mockerPort == mockerPort
@@ -28,7 +28,7 @@ export default class RouteShelf implements IRouteShelf {
         })
     }
 
-    public getItems(mockerPort: string): IRoute[] {
+    public getItems(mockerPort: number): IRoute[] {
         let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
             return mocker.mockerPort == mockerPort
         })
@@ -38,7 +38,7 @@ export default class RouteShelf implements IRouteShelf {
         return []
     }
 
-    public setItem(mockerPort: string, route: IRoute): boolean {
+    public setItem(mockerPort: number, route: IRoute): boolean {
         route.filters.method = route.filters.method.toUpperCase()
         let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
             return mocker.mockerPort == mockerPort
@@ -57,7 +57,7 @@ export default class RouteShelf implements IRouteShelf {
         return true
     }
 
-    public removeItem(mockerPort: string, routePath: string, routeMethod: string): boolean {
+    public removeItem(mockerPort: number, routePath: string, routeMethod: string): boolean {
         let mocker: IMockerRouter = this.mockerRoutesList.find((mocker) => {
             return mocker.mockerPort == mockerPort
         })

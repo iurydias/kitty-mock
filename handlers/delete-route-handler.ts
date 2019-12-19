@@ -19,7 +19,7 @@ export default class DeleteRouteHandler {
             if (err) {
                 return resolve({code: 500, body: getJsend({statusCode: 500, data: undefined, message: err})})
             }
-            let ok: boolean = this.mockerRoutesList.removeItem(req.socket.localPort.toString(), query.path, query.method)
+            let ok: boolean = this.mockerRoutesList.removeItem(req.socket.localPort, query.path, query.method)
             ok ? resolve({code: 204, body: getJsend({statusCode: 204, data: undefined, message: undefined})}) :
                 resolve({
                     code: 404,

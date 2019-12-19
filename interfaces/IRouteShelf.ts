@@ -1,11 +1,11 @@
 import IRoute from './IRoute'
 
 export default interface IRouteShelf {
-    getItems(mockerPort: string): IRoute[]
+    getItems(mockerPort: number): IRoute[]
 
-    getItem(mockerPort: string, path: string, method: string): Promise<IRoute>
+    getItem(mockerPort: number, path: string, method: string): Promise<IRoute>
 
-    setItem(mockerPort: string, route: IRoute): boolean
+    setItem(mockerPort: number, route: IRoute): boolean
 
-    removeItem(mockerPort: string, routePath: string, routeMethod: string): boolean
+    removeItem(mockerPort: number, routePath: string, routeMethod: string): boolean
 }
