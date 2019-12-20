@@ -1,9 +1,9 @@
 import getJsend from '../helpers/get-jsend'
-import {IncomingMessage} from 'http'
+import { IncomingMessage } from 'http'
 import Mocker from '../mocker/mocker'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import RouteShelf from '../routeShelf/route-shelf'
-import {DELETE, GET, POST} from '../consts/methods-consts'
+import { DELETE, GET, POST } from '../consts/methods-consts'
 import CreateRouteHandler from './create-route-handler'
 import DeleteRouteHandler from './delete-route-handler'
 import RoutesGetterHandler from './routes-getter-handler'
@@ -31,17 +31,21 @@ export default class CreateMockerHandler {
   }
 
   public handle (req: IncomingMessage): Promise<IResponse> {
+    return this.createMocker()
+  }
+
+  createMocker (): Promise<IResponse> {
     return new Promise(async (resolve) => {
       let port = getPort(this.portsRange, this.usedPorts)
       if (!port) {
-        resolve({
+        return resolve({
           code: 500,
           body: getJsend({ statusCode: 500, data: undefined, message: 'internal server error' })
         })
       }
       const mocker = new Mocker(this.hostname, port, this.routeShelf, this.requestShelf)
       mocker.loadServer()
-      mocker.runServer().then(() => {
+      return mocker.runServer().then(() => {
         mocker.addRoute({
           filters: { path: `/${RESERVED_PATH}/route`, method: GET },
           response: RoutesGetterHandler.prototype.handle.bind(new RoutesGetterHandler(this.routeShelf))
@@ -70,8 +74,9 @@ export default class CreateMockerHandler {
           filters: { path: '/', method: DELETE },
           response: StopMockerHandler.prototype.handle.bind(new StopMockerHandler(mocker))
         })
+        this.usedPorts.push(port)
         let mockerInfoResponse = { port: port }
-        resolve({
+        return resolve({
           code: 200, body: getJsend({
             statusCode: 200,
             data: JSON.stringify(mockerInfoResponse),
@@ -79,16 +84,10 @@ export default class CreateMockerHandler {
           })
         })
       }).catch(() => {
-        resolve({
-          code: 500,
-          body: getJsend({ statusCode: 500, data: undefined, message: 'internal server error' })
-        })
-      }).finally(() => {
+        console.log(`Retrying to connect in another port, ${port} is in use.`)
         this.usedPorts.push(port)
+        return resolve(this.createMocker())
       })
     })
   }
-
 }
-
-

@@ -14,7 +14,7 @@ describe('Server teste 1', () => {
   after(() => server.stopServer())
 
   it('Check mocker root functionality', () => {
-    createANewMocker('4000', [5000, 6000]).then((port) =>
+    return createANewMocker('4000', [5000, 6000]).then((port) =>
       checkMockerStatus(port).then(() =>
         deleteMocker(port).then(() =>
           checkDeletedMocker(port)
@@ -23,9 +23,19 @@ describe('Server teste 1', () => {
     )
   })
   it('Create two mockers in a range with one port', () => {
-    runServer('127.0.0.1', '4001', '6000-6001').then((serverMockerRoot) =>
+    return runServer('127.0.0.1', '4001', '6000-6001').then((serverMockerRoot) =>
       createANewMocker('4001', [6000, 6001]).then((mockerPort) =>
-        createANewMockerWithFail().then(async () => {
+        createANewMockerWithFail('4001').then(async () => {
+          await deleteMocker(mockerPort)
+          await serverMockerRoot.stopServer()
+        })
+      )
+    )
+  })
+  it('Testing retrying', () => {
+    return runServer('127.0.0.1', '4002', '4002-4004').then((serverMockerRoot) =>
+      createANewMocker('4002', [4002, 4004]).then((mockerPort) =>
+        createANewMockerWithFail('4002').then(async () => {
           await deleteMocker(mockerPort)
           await serverMockerRoot.stopServer()
         })
@@ -33,13 +43,15 @@ describe('Server teste 1', () => {
     )
   })
   it('Request to mocker server root with unacceptable methods', () => {
-    requestToServerRootShouldFail('put')
-    requestToServerRootShouldFail('delete')
-    requestToServerRootShouldFail('get')
-    requestToServerRootShouldFail('patch')
+    return Promise.all([
+      requestToServerRootShouldFail('put'),
+      requestToServerRootShouldFail('delete'),
+      requestToServerRootShouldFail('get'),
+      requestToServerRootShouldFail('patch'),
+    ])
   })
   it('Request to mocker server with unacceptable methods', () => {
-    createANewMocker('4000', [5000, 6000])
+    return createANewMocker('4000', [5000, 6000])
       .then((port) => Promise.all([
         makeRequestToServer('put', port),
         makeRequestToServer('post', port),
@@ -193,6 +205,7 @@ function deleteARoute (port: string, { path, method }) {
   })
 
 }
+
 async function getAndCheckRouteHistory (port: string, { path, method }) {
   let body: string = ''
   let success: number = 0
@@ -216,6 +229,7 @@ async function getAndCheckRouteHistory (port: string, { path, method }) {
   expect(history[0].method).to.equal(POST)
   expect(history[0].date).to.be.not.undefined
 }
+
 async function getAndCheckEmptyRouteHistory (port: string, { path, method }) {
   let success: number = 0
   let failed: number = 0
@@ -243,6 +257,7 @@ async function deleteRouteHistory (port: string, { path, method }) {
   expect(failed).to.equal(0)
   expect(success).to.equal(1)
 }
+
 async function createANewRoute (port: string, status: string, message: string, route: IRoute) {
   let body: string = ''
   await axios.post('http://localhost:' + port + '/=^.^=/route', JSON.stringify(route)).then((response) => {
@@ -292,8 +307,8 @@ function requestToADeletedRoute (method: Method, { port, path, expectedCode }) {
   })
 }
 
-function createANewMockerWithFail () {
-  return axios.post('http://localhost:4001/create').catch((error) => {
+function createANewMockerWithFail (port: string) {
+  return axios.post(`http://localhost:${port}/create`).catch((error) => {
     expect(error.response.status).to.equal(500)
   })
 }
