@@ -30,7 +30,7 @@ export default function server (config: IConfig): Promise<IMocker> {
     server.runServer().then((res) => {
       server.addRoute({
         filters: { path: '/create', method: POST },
-        response: CreateMockerHandler.prototype.handle.bind(new CreateMockerHandler(range(Number(portInit), Number(portLimit), 1), requestShelf))
+        response: CreateMockerHandler.prototype.handle.bind(new CreateMockerHandler(host, range(Number(portInit), Number(portLimit), 1), requestShelf))
       })
       resolve(server)
     }).catch(reject)

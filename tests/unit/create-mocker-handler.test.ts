@@ -11,7 +11,7 @@ describe('Testing create mocker handler', () => {
 
   it('Creating a mocker', async () => {
     let requestShelf: IRequestShelf = new RequestShelf()
-    let response: IResponse = await new CreateMockerHandler([5006, 5010], requestShelf).handle(undefined)
+    let response: IResponse = await new CreateMockerHandler("0.0.0.0", [5006, 5010], requestShelf).handle(undefined)
     expect(response.code).to.equal(200)
     let jsend: IJsend = JSON.parse(response.body)
     expect(jsend.status).to.equal('success')
@@ -23,7 +23,7 @@ describe('Testing create mocker handler', () => {
   })
   it('Deleting a mocker', async () => {
     let requestShelf: IRequestShelf = new RequestShelf()
-    let response: IResponse = await new CreateMockerHandler([6010, 6014], requestShelf).handle(undefined)
+    let response: IResponse = await new CreateMockerHandler("0.0.0.0", [6010, 6014], requestShelf).handle(undefined)
     expect(response.code).to.equal(200)
     let jsend: IJsend = JSON.parse(response.body)
     expect(jsend.status).to.equal('success')

@@ -23,8 +23,8 @@ export default class CreateMockerHandler {
   readonly requestShelf: IRequestShelf
   private usedPorts: number[] = []
 
-  constructor (portsRange: number[], requestShelf: IRequestShelf) {
-    this.hostname = '127.0.0.1'
+  constructor (hostname: string, portsRange: number[], requestShelf: IRequestShelf) {
+    this.hostname = hostname
     this.portsRange = portsRange
     this.routeShelf = new RouteShelf()
     this.requestShelf = requestShelf

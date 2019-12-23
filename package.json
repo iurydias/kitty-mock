@@ -4,7 +4,7 @@
   "description": "API Mocker",
   "main": "server.ts",
   "scripts": {
-    "start": "node main.js",
+    "start": "nodemon main.js",
     "test:mocha": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"CommonJS\"}' mocha $npm_package_config_mocha_reqs",
     "test:unit": "npm -s run test:mocha -- --reporter progress tests/unit/*.test.ts",
     "test:unit:watch": "npm -s run test:mocha -- --watch --reporter progress tests/unit/*.test.ts",
@@ -36,7 +36,8 @@
     "dotenv": "^8.2.0",
     "flatted": "^2.0.1",
     "lodash": "^4.17.15",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "nodemon": "^2.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.5",

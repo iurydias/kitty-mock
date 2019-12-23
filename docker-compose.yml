@@ -1,0 +1,12 @@
+version: "3"
+services:
+  kittymock:
+    build: .
+    command: npm start
+    ports:
+      - "6999-8000:6999-8000"
+    environment:
+      MOCKER_PORTS_RANGE: 7000-8000
+      SERVER_PORT: 6999
+    volumes:
+      - .:/app
