@@ -8,6 +8,7 @@ import IRouteShelf from '../../interfaces/IRouteShelf'
 import RouteShelf from '../../routeShelf/route-shelf'
 import DeleteRouteHandler from '../../handlers/delete-route-handler'
 import IJsend from '../../interfaces/IJsend'
+import { GET, POST } from '../../consts/methods-consts'
 
 describe('Delete route handler', () => {
   it('Testing delete a existent route', () => {

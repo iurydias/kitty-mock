@@ -64,7 +64,7 @@ export default class CreateMockerHandler {
         })
         mocker.addRoute({
           filters: { path: `/${RESERVED_PATH}/history`, method: DELETE },
-          response: DeleteHistoryHandler.prototype.handle.bind(new DeleteHistoryHandler(this.routeShelf,this.requestShelf))
+          response: DeleteHistoryHandler.prototype.handle.bind(new DeleteHistoryHandler(this.routeShelf, this.requestShelf))
         })
         mocker.addRoute({
           filters: { path: '/', method: GET },

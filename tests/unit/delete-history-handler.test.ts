@@ -10,12 +10,14 @@ import IRequest from '../../interfaces/IRequest'
 import DeleteHistoryHandler from '../../handlers/delete-history-handler'
 import IRouteShelf from '../../interfaces/IRouteShelf'
 import RouteShelf from '../../routeShelf/route-shelf'
+import IRoute from '../../interfaces/IRoute'
 
 describe('Create delete history getter handler', () => {
 
   it('Deleting a history with request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let routeShelf: IRouteShelf = new RouteShelf()
+    routeShelf.setItem(7003, getMockRoute())
     requestShelf.setRequest('7003', 'GET/oi', getMockRequest())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
@@ -36,6 +38,7 @@ describe('Create delete history getter handler', () => {
   it('Deleting a history with no request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let routeShelf: IRouteShelf = new RouteShelf()
+    routeShelf.setItem(7003, getMockRoute())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
       new DeleteHistoryHandler(routeShelf, requestShelf).handle(req).then((response) => {
@@ -79,3 +82,9 @@ function getMockRequest (): IRequest {
   }
 }
 
+function getMockRoute(): IRoute {
+  return {
+    filters: {path: '/oi', method: 'GET'},
+    response: {code: 200, body: 'oioi'}
+  }
+}

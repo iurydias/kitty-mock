@@ -10,12 +10,14 @@ import IRequestShelf from '../../interfaces/IRequestShelf'
 import IRequest from '../../interfaces/IRequest'
 import IRouteShelf from '../../interfaces/IRouteShelf'
 import RouteShelf from '../../routeShelf/route-shelf'
+import IRoute from '../../interfaces/IRoute'
 
 describe('Create history getter handler', () => {
 
   it('Getting history with request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let routeShelf: IRouteShelf = new RouteShelf()
+    routeShelf.setItem(7003, getMockRoute('/oi'))
     requestShelf.setRequest('7003', 'GET/oi', getMockRequest())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
@@ -35,6 +37,7 @@ describe('Create history getter handler', () => {
   it('Getting history no request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let routeShelf: IRouteShelf = new RouteShelf()
+    routeShelf.setItem(7004, getMockRoute('/oi'))
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
       new HistoryGetterHandler(routeShelf, requestShelf).handle(req).then((response) => {
@@ -50,9 +53,10 @@ describe('Create history getter handler', () => {
       return server.close()
     })
   })
-  it('Getting history with request but not for the required', () => {
+  it('Getting history with request but not for the required route', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
     let routeShelf: IRouteShelf = new RouteShelf()
+    routeShelf.setItem(7005, getMockRoute('/oii'))
     let success: number = 0
     requestShelf.setRequest('7005', 'GET/oi', getMockRequest())
     let server: Server = createServer(async (req, res) => {
@@ -96,3 +100,9 @@ function getMockRequest (): IRequest {
   }
 }
 
+function getMockRoute(path: string): IRoute {
+  return {
+    filters: {path: path, method: 'GET'},
+    response: {code: 200, body: 'oioi'}
+  }
+}

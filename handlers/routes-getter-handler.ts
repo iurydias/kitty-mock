@@ -1,6 +1,6 @@
 import getJsend from '../helpers/get-jsend'
 import IResponse from '../interfaces/IResponse'
-import {IncomingMessage} from 'http'
+import { IncomingMessage } from 'http'
 import IRoute from '../interfaces/IRoute'
 import IRouteShelf from '../interfaces/IRouteShelf'
 import IFilter from '../interfaces/IFilter'

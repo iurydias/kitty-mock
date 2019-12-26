@@ -214,10 +214,10 @@ describe('Server teste 1', () => {
       )
     )
   })
-  it('Checking route history functionality', () => {
-    return createANewMocker('4000', [5000, 6000]).then(async (port) => {
+  it('Checking route history functionality', () =>
+     createANewMocker('4000', [5000, 6000]).then((port) => {
       let route: IRoute = { filters: { path: '/oi', method: POST }, response: { code: 200, body: 'sddfsdf' } }
-      await createANewRoute(port, 'success', 'route successfully created', route).then(() =>
+      return createANewRoute(port, 'success', 'route successfully created', route).then(() =>
         requestToARoute('POST', {
           port: port,
           path: '/oi',
@@ -234,7 +234,7 @@ describe('Server teste 1', () => {
         )
       )
     })
-  })
+  )
   it('Getting history of a inexistent route', () =>
     createANewMocker('4000', [5000, 6000]).then((port) =>
       requestRouteHistoryWithFailure('GET', 404, port, { path: '/oi', method: POST }).then(() =>

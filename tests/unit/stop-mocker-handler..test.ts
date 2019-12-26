@@ -26,8 +26,8 @@ describe('Stop mocker handler', () => {
         res.end()
       })
     })
-    server.listen(7003)
-    await axios.get('http://127.0.0.1:7003')
+    server.listen(8005)
+    await axios.get('http://127.0.0.1:8005')
     expect(success).to.equal(1)
     await axios.get('http://127.0.0.1:8001').catch(() => {
       fail++

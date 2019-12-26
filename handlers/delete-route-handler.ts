@@ -1,9 +1,9 @@
 import getJsend from '../helpers/get-jsend'
 import { IncomingMessage } from 'http'
 import IRouteShelf from '../interfaces/IRouteShelf'
-import IQuery from '../interfaces/IQuery'
 import IResponse from '../interfaces/IResponse'
 import { checkQuery } from '../helpers/check-query'
+import IFilter from '../interfaces/IFilter'
 
 export default class DeleteRouteHandler {
   private mockerRoutesList: IRouteShelf
@@ -15,7 +15,7 @@ export default class DeleteRouteHandler {
   public handle (req: IncomingMessage): Promise<IResponse> {
     return new Promise(async (resolve) => {
       let url = require('url')
-      let query: IQuery = url.parse(req.url, true).query
+      let query: IFilter = url.parse(req.url, true).query
       let err: string | undefined = checkQuery(query)
       if (err) {
         return resolve({ code: 500, body: getJsend({ statusCode: 500, data: undefined, message: err }) })

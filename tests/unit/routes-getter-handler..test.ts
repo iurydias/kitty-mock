@@ -13,7 +13,7 @@ describe('Getter routes handler', () => {
 
   it('Getting routes with existent route', () => {
     let routeShelf: IRouteShelf = new RouteShelf()
-    routeShelf.setItem(7003, getMockRoute())
+    routeShelf.setItem(8003, getMockRoute())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
       new RoutesGetterHandler(routeShelf).handle(req).then((response) => {
@@ -23,8 +23,8 @@ describe('Getter routes handler', () => {
       res.statusCode = 200
       res.end()
     })
-    server.listen(7003)
-    return axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    server.listen(8003)
+    return axios.delete('http://127.0.0.1:8003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
       return server.close()
     })
@@ -40,8 +40,8 @@ describe('Getter routes handler', () => {
       res.statusCode = 200
       res.end()
     })
-    server.listen(7003)
-    return axios.delete('http://127.0.0.1:7003?path=/oi&method=get').finally(() => {
+    server.listen(8003)
+    return axios.delete('http://127.0.0.1:8003?path=/oi&method=get').finally(() => {
       expect(success).to.equal(1)
       return server.close()
     })

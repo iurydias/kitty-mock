@@ -1,6 +1,6 @@
-import IQuery from '../interfaces/IQuery'
+import IFilter from '../interfaces/IFilter'
 
-export function checkQuery (query: IQuery): string | undefined {
+export function checkQuery (query: IFilter): string | undefined {
   if (query.path == undefined) {
     return 'request query missing path'
   } else if (query.method == undefined) {
