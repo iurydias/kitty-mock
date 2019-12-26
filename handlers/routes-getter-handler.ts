@@ -9,8 +9,8 @@ import { RESERVED_PATH } from '../consts/kitty'
 export default class RoutesGetterHandler {
   private mockerRouteShelf: IRouteShelf
 
-  constructor (mockerRoutesList: IRouteShelf) {
-    this.mockerRouteShelf = mockerRoutesList
+  constructor (mockerRouteShelf: IRouteShelf) {
+    this.mockerRouteShelf = mockerRouteShelf
   }
 
   public handle (req: IncomingMessage): Promise<IResponse> {
@@ -26,7 +26,7 @@ export default class RoutesGetterHandler {
 
 function hydrate (routes: IRoute[]): IFilter[] {
   let filteredRoutes: IRoute[] = routes.filter((route) => {
-    return route.filters.path != `/${RESERVED_PATH}/route` && route.filters.path != `/${RESERVED_PATH}/history`
+    return route.filters.path != `/${RESERVED_PATH}/route` && route.filters.path != `/${RESERVED_PATH}/history` && route.filters.path != `/`
   })
   return filteredRoutes.map((route) => {
     return route.filters

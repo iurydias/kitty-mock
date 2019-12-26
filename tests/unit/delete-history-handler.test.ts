@@ -8,15 +8,18 @@ import RequestShelf from '../../requestShelf/request-shelf'
 import IRequestShelf from '../../interfaces/IRequestShelf'
 import IRequest from '../../interfaces/IRequest'
 import DeleteHistoryHandler from '../../handlers/delete-history-handler'
+import IRouteShelf from '../../interfaces/IRouteShelf'
+import RouteShelf from '../../routeShelf/route-shelf'
 
 describe('Create delete history getter handler', () => {
 
   it('Deleting a history with request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
+    let routeShelf: IRouteShelf = new RouteShelf()
     requestShelf.setRequest('7003', 'GET/oi', getMockRequest())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
-      new DeleteHistoryHandler(requestShelf).handle(req).then((response) => {
+      new DeleteHistoryHandler(routeShelf, requestShelf).handle(req).then((response) => {
         checkResponse(response, 'success', undefined, undefined, 204)
         success++
       })
@@ -32,9 +35,10 @@ describe('Create delete history getter handler', () => {
   })
   it('Deleting a history with no request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
+    let routeShelf: IRouteShelf = new RouteShelf()
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
-      new DeleteHistoryHandler(requestShelf).handle(req).then((response) => {
+      new DeleteHistoryHandler(routeShelf, requestShelf).handle(req).then((response) => {
         checkResponse(response, 'success', undefined, undefined, 204)
         success++
       })

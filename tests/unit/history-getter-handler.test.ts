@@ -8,15 +8,18 @@ import HistoryGetterHandler from '../../handlers/history-getter-handler'
 import RequestShelf from '../../requestShelf/request-shelf'
 import IRequestShelf from '../../interfaces/IRequestShelf'
 import IRequest from '../../interfaces/IRequest'
+import IRouteShelf from '../../interfaces/IRouteShelf'
+import RouteShelf from '../../routeShelf/route-shelf'
 
 describe('Create history getter handler', () => {
 
   it('Getting history with request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
+    let routeShelf: IRouteShelf = new RouteShelf()
     requestShelf.setRequest('7003', 'GET/oi', getMockRequest())
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
-      new HistoryGetterHandler(requestShelf).handle(req).then((response) => {
+      new HistoryGetterHandler(routeShelf, requestShelf).handle(req).then((response) => {
         checkResponse(response, 'success', '[{"ip":"127.0.0.1","header":{},"body":"oi","method":"GET","url":"/oi","date":"data"}]', undefined, 200)
         success++
       })
@@ -31,9 +34,10 @@ describe('Create history getter handler', () => {
   })
   it('Getting history no request', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
+    let routeShelf: IRouteShelf = new RouteShelf()
     let success: number = 0
     let server: Server = createServer(async (req, res) => {
-      new HistoryGetterHandler(requestShelf).handle(req).then((response) => {
+      new HistoryGetterHandler(routeShelf, requestShelf).handle(req).then((response) => {
         checkResponse(response, 'success', '[]', undefined, 200)
         success++
       })
@@ -48,10 +52,11 @@ describe('Create history getter handler', () => {
   })
   it('Getting history with request but not for the required', () => {
     let requestShelf: IRequestShelf = new RequestShelf()
+    let routeShelf: IRouteShelf = new RouteShelf()
     let success: number = 0
     requestShelf.setRequest('7005', 'GET/oi', getMockRequest())
     let server: Server = createServer(async (req, res) => {
-      new HistoryGetterHandler(requestShelf).handle(req).then((response) => {
+      new HistoryGetterHandler(routeShelf, requestShelf).handle(req).then((response) => {
         checkResponse(response, 'success', '[]', undefined, 200)
         success++
       })
