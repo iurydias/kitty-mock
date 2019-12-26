@@ -54,7 +54,7 @@ export default class RouteShelf implements IRouteShelf {
       })
       if (routeItem) {
         mocker.routesList = this.filterPathAndMethodDifferentsRoutes(mocker.routesList, {
-          path: routeItem.filters.method,
+          path: routeItem.filters.path,
           method: routeMethod.toUpperCase()
         })
       }
@@ -71,7 +71,7 @@ export default class RouteShelf implements IRouteShelf {
   }
 
   private filterPathAndMethodDifferentsRoutes (routesList: IRoute[], { path, method }): IRoute[] {
-    return routesList.filter((route) => route.filters.path != path && route.filters.method != method)
+    return routesList.filter((route) => !(route.filters.path == path && route.filters.method == method))
   }
 
   private getRouteByPathAndMethod (routesList: IRoute[], { path, method }): IRoute {

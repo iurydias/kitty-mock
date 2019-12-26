@@ -279,6 +279,27 @@ describe('Server teste 1', () => {
       )
     )
   )
+  it('Deleting route with history, creating again and getting empty history', () =>
+    createANewMocker('4000', [5000, 6000]).then((port) => {
+      let route: IRoute = { filters: { path: '/oi', method: POST }, response: { code: 200, body: 'sddfsdf' } }
+      return createANewRoute(port, 'success', 'route successfully created', route).then(() =>
+        requestToARoute('POST', {
+          port: port,
+          path: '/oi',
+          expectedCode: 200,
+          expectedResponse: '"sddfsdf"'
+        }).then(() =>
+          deleteARoute(port, { path: '/oi', method: 'POST' }).then(() =>
+            createANewRoute(port, 'success', 'route successfully created', route).then(() =>
+              getAndCheckEmptyRouteHistory(port, { path: '/oi', method: POST }).then(() =>
+                deleteMocker(port)
+              )
+            )
+          )
+        )
+      )
+    })
+  )
 })
 
 function runServer (host: string, port: string, portsRange: string): Promise<IMocker> {

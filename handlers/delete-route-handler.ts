@@ -4,12 +4,15 @@ import IRouteShelf from '../interfaces/IRouteShelf'
 import IResponse from '../interfaces/IResponse'
 import { checkQuery } from '../helpers/check-query'
 import IFilter from '../interfaces/IFilter'
+import IRequestShelf from '../interfaces/IRequestShelf'
 
 export default class DeleteRouteHandler {
-  private mockerRoutesList: IRouteShelf
+  private mockerRouteShelf: IRouteShelf
+  private mockerRequestShelf: IRequestShelf
 
-  constructor (mockerRoutesList: IRouteShelf) {
-    this.mockerRoutesList = mockerRoutesList
+  constructor (mockerRouteShelf: IRouteShelf, mockerRequestShelf: IRequestShelf) {
+    this.mockerRouteShelf = mockerRouteShelf
+    this.mockerRequestShelf = mockerRequestShelf
   }
 
   public handle (req: IncomingMessage): Promise<IResponse> {
@@ -20,7 +23,8 @@ export default class DeleteRouteHandler {
       if (err) {
         return resolve({ code: 500, body: getJsend({ statusCode: 500, data: undefined, message: err }) })
       }
-      let ok: boolean = this.mockerRoutesList.removeItem(req.socket.localPort, query.path, query.method)
+      this.mockerRequestShelf.deleteRequests(req.socket.localPort.toString(), query.method.toUpperCase() + query.path)
+      let ok: boolean = this.mockerRouteShelf.removeItem(req.socket.localPort, query.path, query.method)
       ok ? resolve({ code: 204, body: getJsend({ statusCode: 204, data: undefined, message: undefined }) }) :
         resolve({
           code: 404,

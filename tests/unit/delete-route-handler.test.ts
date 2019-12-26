@@ -9,14 +9,17 @@ import RouteShelf from '../../routeShelf/route-shelf'
 import DeleteRouteHandler from '../../handlers/delete-route-handler'
 import IJsend from '../../interfaces/IJsend'
 import { GET, POST } from '../../consts/methods-consts'
+import IRequestShelf from '../../interfaces/IRequestShelf'
+import RequestShelf from '../../requestShelf/request-shelf'
 
 describe('Delete route handler', () => {
   it('Testing delete a existent route', () => {
     let routeShelf: IRouteShelf = new RouteShelf()
+    let requestShelf: IRequestShelf = new RequestShelf()
     routeShelf.setItem(5019, getMockRoute())
     let success: number = 0
     let failed: number = 0
-    const handler = new DeleteRouteHandler(routeShelf)
+    const handler = new DeleteRouteHandler(routeShelf, requestShelf)
     let server: Server = createServer((req, res) => {
       handler.handle(req).then((response) => {
         checkResponse(response, 'success', undefined, 204)
@@ -34,9 +37,10 @@ describe('Delete route handler', () => {
   })
   it('Testing delete a inexistent route', () => {
     let routeShelf: IRouteShelf = new RouteShelf()
+    let requestShelf: IRequestShelf = new RequestShelf()
     let success: number = 0
     let failed: number = 0
-    const handler = new DeleteRouteHandler(routeShelf)
+    const handler = new DeleteRouteHandler(routeShelf, requestShelf)
     let server: Server = createServer((req, res) => {
       handler.handle(req).then((response) => {
         checkResponse(response, 'fail', 'route does not exist', 404)
